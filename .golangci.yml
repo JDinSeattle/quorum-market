@@ -1,0 +1,91 @@
+# Lint configuration.
+#
+# The selection favours linters that catch real defects — ignored errors,
+# leaked contexts, unsafe loops — over stylistic ones. A lint run that mostly
+# reports formatting opinions gets muted, and then the useful findings go with
+# it.
+
+version: "2"
+
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  enable:
+    # Correctness
+    - errcheck        # an ignored error is the most common Go defect
+    - govet
+    - staticcheck
+    - ineffassign
+    - bodyclose       # an unclosed response body leaks a connection
+    - contextcheck    # a lost context breaks cancellation and tracing
+    - noctx           # HTTP calls without a context cannot time out
+    - rowserrcheck
+    - errorlint       # comparing errors with == breaks on wrapping
+    - nilerr
+    - makezero
+    - durationcheck
+    - asasalint
+
+    # Resource safety
+    - unconvert
+    - unused
+    - wastedassign
+
+    # Readability
+    - misspell
+    - revive
+    - godot           # comments end in a period, so they read as sentences
+    - nolintlint      # every nolint has to say why
+
+  settings:
+    errcheck:
+      check-type-assertions: true
+      exclude-functions:
+        # These write to a response that is already committed or being
+        # discarded; there is nothing useful to do with the error.
+        - (net/http.ResponseWriter).Write
+        - io.Copy(io.Discard)
+
+    revive:
+      rules:
+        - name: exported
+          arguments: ["disableStutteringCheck"]
+        - name: package-comments
+        - name: indent-error-flow
+        - name: superfluous-else
+        - name: unreachable-code
+        - name: early-return
+
+    govet:
+      enable:
+        # Not shadow: `if err := f(); err != nil` shadows an outer err by
+        # design, and flagging the single most common statement in Go buries
+        # the findings that matter.
+        - nilness
+
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+
+  exclusions:
+    generated: lax
+    rules:
+      # Tests deliberately ignore errors on setup calls whose failure would
+      # show up as an obvious test failure anyway.
+      - path: _test\.go
+        linters: [errcheck, bodyclose, noctx, contextcheck]
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/JDinSeattle/quorum-market
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0

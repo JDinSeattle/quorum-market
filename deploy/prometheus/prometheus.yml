@@ -1,0 +1,70 @@
+# Scrapes every service's admin port.
+#
+# The service name is attached here rather than baked into the application's
+# metric labels: identity belongs to the scrape target, and duplicating it into
+# every series would multiply the storage for no extra information.
+
+global:
+  scrape_interval: 10s
+  evaluation_interval: 10s
+  external_labels:
+    stack: quorum-market-local
+
+rule_files:
+  - /etc/prometheus/alerts.yml
+
+scrape_configs:
+  - job_name: services
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["product-service:9100"]
+        labels: { service: product-service, tier: application }
+      - targets: ["shopping-cart-service:9100"]
+        labels: { service: shopping-cart-service, tier: application }
+      - targets: ["warehouse-service:9100"]
+        labels: { service: warehouse-service, tier: application }
+      - targets: ["cca-service:9100"]
+        labels: { service: cca-service, tier: application }
+      - targets: ["gateway:9100"]
+        labels: { service: gateway, tier: edge }
+      - targets: ["identity-service:9100"]
+        labels: { service: identity-service, tier: application }
+      - targets: ["order-service:9100"]
+        labels: { service: order-service, tier: application }
+      - targets: ["notification-service:9100"]
+        labels: { service: notification-service, tier: application }
+
+  - job_name: product-db
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - "product-db-leader:9100"
+          - "product-db-follower1:9100"
+          - "product-db-follower2:9100"
+          - "product-db-follower3:9100"
+          - "product-db-follower4:9100"
+        labels: { cluster: product-db, tier: database }
+
+  - job_name: cart-db
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - "cart-db-node1:9100"
+          - "cart-db-node2:9100"
+          - "cart-db-node3:9100"
+          - "cart-db-node4:9100"
+          - "cart-db-node5:9100"
+        labels: { cluster: cart-db, tier: database }
+
+  - job_name: core-db
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - "core-db-node1:9100"
+          - "core-db-node2:9100"
+          - "core-db-node3:9100"
+        labels: { cluster: core-db, tier: database }
+
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]

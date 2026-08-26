@@ -1,0 +1,20 @@
+version: 2
+
+updates:
+  - package-ecosystem: gomod
+    directory: /
+    schedule: { interval: weekly }
+    groups:
+      # One pull request for routine bumps. Individually they are noise;
+      # together they are a single review with one CI run.
+      go-dependencies:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: monthly }
+
+  - package-ecosystem: docker
+    directory: /deploy
+    schedule: { interval: weekly }

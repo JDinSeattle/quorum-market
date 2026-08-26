@@ -1,0 +1,7 @@
+.git
+.github
+terraform
+loadtest
+deploy/docker-compose.yml
+*.md
+docs

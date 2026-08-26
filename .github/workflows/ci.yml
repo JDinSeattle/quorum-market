@@ -1,0 +1,210 @@
+# Everything that has to hold before a change is merged.
+#
+# The jobs are split so a failure names its own cause: "lint" and "test" and
+# "image" failing are three different conversations, and a single monolithic
+# job would make you read the log to find out which one you are having.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # A new push makes the previous run's answer irrelevant, so stop paying for it.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GO_VERSION: "1.26"
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: go mod tidy is up to date
+        run: |
+          go mod tidy
+          git diff --exit-code -- go.mod go.sum \
+            || { echo "::error::go.mod/go.sum are stale — run 'go mod tidy'"; exit 1; }
+
+      - uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+          args: --timeout=5m
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - run: go vet ./...
+
+      # The race detector is the point of this job. Half this system is
+      # concurrent — quorum fan-out, the reservation ledger, the channel
+      # pool — and a data race there is exactly the kind of bug that passes
+      # every deterministic test and then corrupts inventory under load.
+      - name: Test with the race detector
+        run: go test ./... -race -count=1 -coverprofile=coverage.out -covermode=atomic
+
+      - name: Coverage summary
+        run: go tool cover -func=coverage.out | tail -1
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: coverage.out
+
+  vulncheck:
+    name: Vulnerabilities
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      # Reports only vulnerabilities in code paths actually reachable from
+      # this binary, so it does not cry wolf about a CVE in a dependency
+      # function nothing calls.
+      - name: govulncheck
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          govulncheck ./...
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      # The images run linux/amd64 on EC2 regardless of what anyone develops
+      # on, so that is what gets compiled here.
+      - name: Build every binary
+        run: GOOS=linux GOARCH=amd64 go build -trimpath -o /tmp/bin/ ./cmd/...
+
+      - name: Confirm every service was produced
+        run: |
+          for binary in kvnode gatewaysvc identitysvc productsvc cartsvc ordersvc \
+                        notificationsvc ccasvc warehousesvc productloader healthcheck; do
+            test -x "/tmp/bin/$binary" || { echo "::error::$binary was not built"; exit 1; }
+          done
+
+  image:
+    name: Container image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build the image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/Dockerfile
+          push: false
+          load: true
+          tags: quorum-market:ci
+          build-args: |
+            VERSION=${{ github.ref_name }}
+            COMMIT=${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: The image reports its own provenance
+        run: |
+          docker run --rm --entrypoint /usr/local/bin/healthcheck quorum-market:ci 2>&1 \
+            | grep -q "usage: healthcheck" \
+            || { echo "::error::the healthcheck binary is missing from the image"; exit 1; }
+
+  integration:
+    name: Integration
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      # The real proof: the whole stack, including the broker and both
+      # database clusters, serving both use cases end to end. Unit tests cover
+      # the logic; this covers the wiring.
+      - name: Start the stack
+        run: docker compose -f deploy/docker-compose.yml up --build -d --wait --wait-timeout 300
+
+      - name: Seed the catalogue
+        run: docker compose -f deploy/docker-compose.yml --profile seed run --rm product-loader
+
+      - name: Smoke test — commerce path
+        run: ./scripts/smoke.sh
+
+      - name: Smoke test — platform
+        run: ./scripts/smoke-platform.sh
+
+      - name: Dump logs on failure
+        if: failure()
+        run: docker compose -f deploy/docker-compose.yml logs --tail 100
+
+      # The recorded run is the artifact worth keeping: it says which commit,
+      # on what, with what output, and what was skipped.
+      - name: Collect evidence
+        if: always()
+        run: ./scripts/collect-evidence.sh || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evidence
+          path: evidence/latest/
+
+      - name: Tear down
+        if: always()
+        run: docker compose -f deploy/docker-compose.yml down -v
+
+  infrastructure:
+    name: Terraform
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Formatting
+        run: terraform -chdir=terraform fmt -recursive -check -diff
+
+      # No backend and no credentials: this validates the configuration is
+      # well formed, it does not touch an AWS account.
+      - name: Validate
+        run: |
+          terraform -chdir=terraform init -backend=false
+          terraform -chdir=terraform validate

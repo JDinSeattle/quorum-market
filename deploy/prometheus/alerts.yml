@@ -1,0 +1,178 @@
+# Alerts worth waking someone for.
+#
+# Each one is about a customer-visible symptom rather than a resource number: a
+# CPU graph does not tell you whether anyone can buy anything, and paging on
+# saturation that nobody notices is how alert fatigue starts.
+
+groups:
+  - name: availability
+    rules:
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels: { severity: critical }
+        annotations:
+          summary: "{{ $labels.service }}{{ $labels.instance }} is not answering scrapes"
+          description: "The process is gone or wedged. Check the container and its readiness endpoint."
+
+      - alert: HighServerErrorRate
+        expr: |
+          sum by (service) (rate(quorum_http_server_requests_total{status="5xx"}[5m]))
+            /
+          sum by (service) (rate(quorum_http_server_requests_total[5m]))
+            > 0.05
+        for: 5m
+        labels: { severity: critical }
+        annotations:
+          summary: "{{ $labels.service }} is failing more than 5% of requests"
+
+      - alert: RequestsBeingShed
+        expr: rate(quorum_http_server_shed_requests_total[5m]) > 0
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "{{ $labels.service }} is at its concurrency limit and rejecting requests"
+          description: "Either scale out, or MAX_IN_FLIGHT is set below what the instance can actually handle."
+
+      - alert: CircuitBreakerOpen
+        expr: quorum_circuit_breaker_state > 0
+        for: 2m
+        labels: { severity: warning }
+        annotations:
+          summary: "{{ $labels.service }} has cut off {{ $labels.dependency }}"
+          description: "Calls are failing fast rather than queueing. Look at the dependency, not the caller."
+
+  - name: latency
+    rules:
+      - alert: CheckoutLatencyHigh
+        expr: |
+          histogram_quantile(0.99,
+            sum by (le) (rate(quorum_http_server_request_duration_seconds_bucket{route="/shopping-cart/{cartId}/checkout"}[5m]))
+          ) > 5
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "Checkout p99 is above 5s"
+
+  - name: fulfilment
+    rules:
+      # The single most important alert here. A message on the dead-letter
+      # queue is an order a customer paid for that the warehouse could not
+      # process, and nothing else in the system will notice.
+      - alert: OrdersDeadLettered
+        expr: increase(quorum_queue_messages_total{disposition="dead_lettered"}[15m]) > 0
+        labels: { severity: critical }
+        annotations:
+          summary: "Paid orders are being parked on the dead-letter queue"
+          description: "Inspect {{ $labels.queue }}.dlq. These orders are charged but unshipped."
+
+      - alert: ShipMessagesNotPublishing
+        expr: increase(quorum_queue_messages_total{disposition="publish_failed"}[10m]) > 0
+        labels: { severity: critical }
+        annotations:
+          summary: "Confirmed orders are not reaching the queue"
+          description: "Checkout succeeds and the customer is charged, but fulfilment never hears about it."
+
+  - name: domain
+    rules:
+      - alert: DeclineRateAbnormal
+        expr: |
+          sum(rate(quorum_domain_events_total{event="checkout",outcome="declined"}[15m]))
+            /
+          sum(rate(quorum_domain_events_total{event="checkout"}[15m]))
+            > 0.25
+        for: 15m
+        labels: { severity: warning }
+        annotations:
+          summary: "A quarter of checkouts are being declined"
+          description: "Expected steady state is ~10%. A jump usually means the authorizer is misbehaving, not that customers changed."
+
+      - alert: InventoryOversold
+        expr: increase(quorum_domain_events_total{event="inventory",outcome="oversold"}[1h]) > 0
+        labels: { severity: warning }
+        annotations:
+          summary: "Stock was deducted below zero"
+          description: "A shipment arrived with no live reservation. Usually a queue backlog outlasting the reservation TTL."
+
+      - alert: ReservationsPilingUp
+        expr: quorum_inventory_pending_reservations > 500
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "Held reservations are not being resolved"
+          description: "Checkouts are starting and not finishing, so stock is held against orders nobody is placing."
+
+  - name: edge
+    rules:
+      - alert: AuthenticationFailureSpike
+        expr: |
+          sum(rate(quorum_auth_attempts_total{result="denied"}[5m]))
+            /
+          clamp_min(sum(rate(quorum_auth_attempts_total[5m])), 0.001)
+            > 0.5
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "Over half of authentication attempts are being denied"
+          description: "Either an integration broke or someone is guessing credentials. Check which operation is failing."
+
+      - alert: SustainedThrottling
+        expr: |
+          sum(rate(quorum_ratelimit_decisions_total{decision="throttled"}[10m])) > 5
+        for: 15m
+        labels: { severity: warning }
+        annotations:
+          summary: "The gateway is throttling steadily"
+          description: "Either a client is misbehaving or the limit is set below legitimate traffic."
+
+      - alert: RateLimiterFailingOpen
+        expr: rate(quorum_ratelimit_decisions_total{decision="error"}[5m]) > 0
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "The rate limiter cannot reach Redis and is admitting everything"
+          description: "The limit is not being enforced. Traffic is unprotected until Redis returns."
+
+  - name: cache
+    rules:
+      # A cache that stops being hit is a cache that is no longer protecting
+      # the database, and the database usually notices before anyone else does.
+      - alert: CacheHitRatioCollapsed
+        expr: |
+          sum(rate(quorum_cache_operations_total{result=~"hit|hit_negative"}[10m]))
+            /
+          clamp_min(sum(rate(quorum_cache_operations_total{result=~"hit|hit_negative|miss"}[10m])), 0.001)
+            < 0.5
+        for: 15m
+        labels: { severity: warning }
+        annotations:
+          summary: "The catalogue cache is hitting less than half the time"
+          description: "Either it is being invalidated constantly or Redis is failing open. The product database is now taking the full read load."
+
+      # Only genuine errors. A caller hanging up mid-request is counted as
+      # "abandoned" precisely so it does not show up here.
+      - alert: CacheFailingOpen
+        expr: rate(quorum_cache_operations_total{result="error"}[5m]) > 1
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "The cache is erroring and every read is going to the database"
+          description: "Redis is unreachable or timing out. The product database is taking the full read load."
+
+  - name: replication
+    rules:
+      - alert: QuorumFailures
+        expr: rate(quorum_kv_quorum_failures_total[5m]) > 0
+        for: 5m
+        labels: { severity: critical }
+        annotations:
+          summary: "{{ $labels.cluster }} cannot reach its {{ $labels.operation }} quorum"
+          description: "Enough replicas are unreachable that the cluster is refusing operations."
+
+      - alert: ReplicationFailing
+        expr: |
+          sum by (cluster) (rate(quorum_kv_replication_total{outcome="error"}[5m])) > 1
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "{{ $labels.cluster }} replicas are falling behind"

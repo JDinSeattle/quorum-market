@@ -1,0 +1,583 @@
+# Full local stack. From the repository root:
+#
+#   make up                      build and start everything
+#   make seed                    fill the catalogue with 1000 products
+#   make smoke                   exercise both use cases end to end
+#   make observability           add Prometheus and Grafana
+#
+# Ports
+#   8080 gateway  <- the front door; everything else is here for debugging
+#   8081 product  8082 shopping-cart  8083 cca  8084 warehouse
+#   8085 identity 8086 orders         8087 notifications
+#   9080 product-db leader, 9081-9084 followers
+#   9090-9094 cart-db nodes 1-5
+#   9095-9097 core-db nodes 1-3
+#   6379 redis, 5672 amqp, 15672 rabbitmq management (guest/guest)
+#   9200-9220 per-container admin ports (/metrics, /readyz, /debug/pprof)
+#   9490 prometheus, 3000 grafana (observability profile;
+#        override with PROMETHEUS_PORT / GRAFANA_PORT)
+
+name: quorum-market
+
+# ── Shared fragments ─────────────────────────────────────────────────────────
+
+# Log rotation is not optional. Without it a container left running under load
+# fills the host disk with JSON, and the first symptom is every service on the
+# box failing at once for reasons that look unrelated.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+# Defence in depth for containers that only ever need to read their own binary:
+# an immutable root filesystem and no path to gaining privileges.
+x-hardening: &hardening
+  read_only: true
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+
+x-app: &app
+  build:
+    context: ..
+    dockerfile: deploy/Dockerfile
+    args:
+      VERSION: ${VERSION:-local}
+      COMMIT: ${COMMIT:-unknown}
+      BUILD_DATE: ${BUILD_DATE:-unknown}
+  # A fixed tag rather than ${VERSION}. The version is stamped into the
+  # binaries at build time, so the tag does not need to carry it — and a tag
+  # that varies with the environment means `docker compose` run directly picks
+  # a different, possibly stale, image than `make up` built.
+  image: quorum-market:local
+  restart: unless-stopped
+  networks: [mesh]
+  logging: *logging
+  read_only: true
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+
+x-app-env: &app-env
+  # Human-readable locally; the default everywhere else is JSON, because in
+  # production these lines are parsed rather than read.
+  LOG_FORMAT: text
+  LOG_LEVEL: ${LOG_LEVEL:-info}
+  ADMIN_PORT: 9100
+
+x-auth-env: &auth-env
+  # A fixed development secret so tokens survive a restart and are accepted by
+  # every service in the stack. It is checked in on purpose — it protects
+  # nothing on a laptop — and JWT_SECRET must be set to a real secret anywhere
+  # that matters. Terraform requires one rather than defaulting.
+  JWT_SECRET: ${JWT_SECRET:-local-development-secret-not-for-any-real-deployment}
+  JWT_ISSUER: ${JWT_ISSUER:-quorum-market}
+
+x-service-limits: &service-limits
+  deploy:
+    resources:
+      limits: { cpus: "1.0", memory: 512M }
+      reservations: { memory: 128M }
+
+x-db-limits: &db-limits
+  deploy:
+    resources:
+      limits: { cpus: "0.5", memory: 256M }
+      reservations: { memory: 64M }
+
+# The product cluster: one leader, four followers, W=5 so a write is on every
+# replica before it is acknowledged and R=1 so reads are a single local lookup.
+x-product-db: &product-db
+  <<: [*app, *db-limits]
+  command: ["/usr/local/bin/kvnode"]
+  healthcheck:
+    test: ["CMD", "/usr/local/bin/healthcheck", "http://localhost:8080/health"]
+    interval: 10s
+    timeout: 3s
+    retries: 5
+    start_period: 10s
+
+x-product-db-env: &product-db-env
+  <<: *app-env
+  SERVER_PORT: 8080
+  NODE_MODE: leader-follower
+  ROLE: follower
+  WRITE_QUORUM_SIZE: 5
+  READ_QUORUM_SIZE: 1
+  WRITE_DELAY_MS: 5
+  READ_DELAY_MS: 2
+
+# The cart cluster: no leader, W=3 and R=3 over 5 nodes so the quorums always
+# overlap and any node can accept a write.
+x-cart-db: &cart-db
+  <<: [*app, *db-limits]
+  command: ["/usr/local/bin/kvnode"]
+  healthcheck:
+    test: ["CMD", "/usr/local/bin/healthcheck", "http://localhost:8080/health"]
+    interval: 10s
+    timeout: 3s
+    retries: 5
+    start_period: 10s
+
+x-cart-db-env: &cart-db-env
+  <<: *app-env
+  SERVER_PORT: 8080
+  NODE_MODE: leaderless
+  WRITE_QUORUM_SIZE: 3
+  READ_QUORUM_SIZE: 3
+  WRITE_DELAY_MS: 5
+  READ_DELAY_MS: 2
+
+# The core cluster: accounts and orders. Three nodes with W=2/R=2 rather than
+# five with W=3/R=3, because this data is written far less often than carts and
+# a smaller quorum costs less per write while still tolerating one node down.
+#
+# Identity and orders share a cluster. That is a deliberate compromise: strict
+# service-per-database would mean two more three-node clusters to operate for
+# two services that between them hold a few thousand small records. The
+# namespaces are separate (user: and order:), so splitting them later is a
+# configuration change rather than a migration.
+x-core-db: &core-db
+  <<: [*app, *db-limits]
+  command: ["/usr/local/bin/kvnode"]
+  healthcheck:
+    test: ["CMD", "/usr/local/bin/healthcheck", "http://localhost:8080/health"]
+    interval: 10s
+    timeout: 3s
+    retries: 5
+    start_period: 10s
+
+x-core-db-env: &core-db-env
+  <<: *app-env
+  SERVER_PORT: 8080
+  NODE_MODE: leaderless
+  WRITE_QUORUM_SIZE: 2
+  READ_QUORUM_SIZE: 2
+  WRITE_DELAY_MS: 5
+  READ_DELAY_MS: 2
+
+networks:
+  mesh:
+    driver: bridge
+
+volumes:
+  rabbitmq-data:
+  redis-data:
+  prometheus-data:
+  grafana-data:
+
+services:
+
+  # ── Broker ────────────────────────────────────────────────────────────────
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: unless-stopped
+    ports: ["5672:5672", "15672:15672"]
+    networks: [mesh]
+    logging: *logging
+    volumes:
+      # Queues are declared durable and messages are published persistent, so
+      # the broker keeping its state across restarts is what makes that mean
+      # anything.
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    deploy:
+      resources:
+        limits: { cpus: "1.0", memory: 512M }
+
+  # ── Redis: cache, sessions, rate limiting, notification inboxes ───────────
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+    ports: ["6379:6379"]
+    networks: [mesh]
+    logging: *logging
+    volumes:
+      - redis-data:/data
+    # Append-only, because not everything in here is a cache. A restart losing
+    # the catalogue cache is free; a restart logging out every customer is not.
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --maxmemory
+      - 256mb
+      # Evict only keys that carry a TTL. Everything cached sets one; session
+      # and rate-limit state does too, so nothing untracked can be silently
+      # dropped under pressure.
+      - --maxmemory-policy
+      - allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    deploy:
+      resources:
+        limits: { cpus: "0.5", memory: 384M }
+
+  # ── Core KV cluster (leaderless, W=2 / R=2): accounts and orders ──────────
+  core-db-node1:
+    <<: *core-db
+    container_name: core-db-node1
+    ports: ["9095:8080", "9218:9100"]
+    environment:
+      <<: *core-db-env
+      NODE_ID: core-db-node1
+      PEER_URLS: http://core-db-node2:8080,http://core-db-node3:8080
+
+  core-db-node2:
+    <<: *core-db
+    container_name: core-db-node2
+    ports: ["9096:8080", "9219:9100"]
+    environment:
+      <<: *core-db-env
+      NODE_ID: core-db-node2
+      PEER_URLS: http://core-db-node1:8080,http://core-db-node3:8080
+
+  core-db-node3:
+    <<: *core-db
+    container_name: core-db-node3
+    ports: ["9097:8080", "9220:9100"]
+    environment:
+      <<: *core-db-env
+      NODE_ID: core-db-node3
+      PEER_URLS: http://core-db-node1:8080,http://core-db-node2:8080
+
+  # ── Product KV cluster (leader-follower, W=5 / R=1) ───────────────────────
+  product-db-leader:
+    <<: *product-db
+    container_name: product-db-leader
+    ports: ["9080:8080", "9200:9100"]
+    environment:
+      <<: *product-db-env
+      NODE_ID: product-db-leader
+      ROLE: leader
+      FOLLOWER_URLS: http://product-db-follower1:8080,http://product-db-follower2:8080,http://product-db-follower3:8080,http://product-db-follower4:8080
+
+  product-db-follower1:
+    <<: *product-db
+    container_name: product-db-follower1
+    ports: ["9081:8080", "9201:9100"]
+    environment: { <<: *product-db-env, NODE_ID: product-db-follower1 }
+
+  product-db-follower2:
+    <<: *product-db
+    container_name: product-db-follower2
+    ports: ["9082:8080", "9202:9100"]
+    environment: { <<: *product-db-env, NODE_ID: product-db-follower2 }
+
+  product-db-follower3:
+    <<: *product-db
+    container_name: product-db-follower3
+    ports: ["9083:8080", "9203:9100"]
+    environment: { <<: *product-db-env, NODE_ID: product-db-follower3 }
+
+  product-db-follower4:
+    <<: *product-db
+    container_name: product-db-follower4
+    ports: ["9084:8080", "9204:9100"]
+    environment: { <<: *product-db-env, NODE_ID: product-db-follower4 }
+
+  # ── Cart KV cluster (leaderless, W=3 / R=3) ───────────────────────────────
+  cart-db-node1:
+    <<: *cart-db
+    container_name: cart-db-node1
+    ports: ["9090:8080", "9205:9100"]
+    environment:
+      <<: *cart-db-env
+      NODE_ID: cart-db-node1
+      PEER_URLS: http://cart-db-node2:8080,http://cart-db-node3:8080,http://cart-db-node4:8080,http://cart-db-node5:8080
+
+  cart-db-node2:
+    <<: *cart-db
+    container_name: cart-db-node2
+    ports: ["9091:8080", "9206:9100"]
+    environment:
+      <<: *cart-db-env
+      NODE_ID: cart-db-node2
+      PEER_URLS: http://cart-db-node1:8080,http://cart-db-node3:8080,http://cart-db-node4:8080,http://cart-db-node5:8080
+
+  cart-db-node3:
+    <<: *cart-db
+    container_name: cart-db-node3
+    ports: ["9092:8080", "9207:9100"]
+    environment:
+      <<: *cart-db-env
+      NODE_ID: cart-db-node3
+      PEER_URLS: http://cart-db-node1:8080,http://cart-db-node2:8080,http://cart-db-node4:8080,http://cart-db-node5:8080
+
+  cart-db-node4:
+    <<: *cart-db
+    container_name: cart-db-node4
+    ports: ["9093:8080", "9208:9100"]
+    environment:
+      <<: *cart-db-env
+      NODE_ID: cart-db-node4
+      PEER_URLS: http://cart-db-node1:8080,http://cart-db-node2:8080,http://cart-db-node3:8080,http://cart-db-node5:8080
+
+  cart-db-node5:
+    <<: *cart-db
+    container_name: cart-db-node5
+    ports: ["9094:8080", "9209:9100"]
+    environment:
+      <<: *cart-db-env
+      NODE_ID: cart-db-node5
+      PEER_URLS: http://cart-db-node1:8080,http://cart-db-node2:8080,http://cart-db-node3:8080,http://cart-db-node4:8080
+
+  # ── Services ──────────────────────────────────────────────────────────────
+  product-service:
+    <<: [*app, *service-limits]
+    container_name: product-service
+    command: ["/usr/local/bin/productsvc"]
+    ports: ["8081:8081", "9210:9100"]
+    environment:
+      <<: *app-env
+      PORT: 8081
+      PRODUCT_DB_URL: http://product-db-leader:8080
+      REDIS_ADDR: redis:6379
+      CACHE_TTL_MS: 300000
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck", "http://localhost:8081/product/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      redis: { condition: service_healthy }
+      product-db-leader: { condition: service_healthy }
+      product-db-follower1: { condition: service_healthy }
+      product-db-follower2: { condition: service_healthy }
+      product-db-follower3: { condition: service_healthy }
+      product-db-follower4: { condition: service_healthy }
+
+  cca-service:
+    <<: [*app, *service-limits]
+    container_name: cca-service
+    command: ["/usr/local/bin/ccasvc"]
+    ports: ["8083:8083", "9211:9100"]
+    environment:
+      <<: *app-env
+      SERVER_PORT: 8083
+      CCA_APPROVAL_RATE: ${CCA_APPROVAL_RATE:-0.9}
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck", "http://localhost:8083/credit-card-authorizer/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  warehouse-service:
+    <<: [*app, *service-limits]
+    container_name: warehouse-service
+    command: ["/usr/local/bin/warehousesvc"]
+    ports: ["8084:8084", "9212:9100"]
+    environment:
+      <<: *app-env
+      SERVER_PORT: 8084
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: guest
+      RABBITMQ_PASS: guest
+      WAREHOUSE_INITIAL_STOCK: ${WAREHOUSE_INITIAL_STOCK:-100}
+      RESERVATION_TTL_MS: 30000
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck", "http://localhost:8084/warehouse/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+
+  shopping-cart-service:
+    <<: [*app, *service-limits]
+    container_name: shopping-cart-service
+    command: ["/usr/local/bin/cartsvc"]
+    ports: ["8082:8082", "9213:9100"]
+    environment:
+      <<: *app-env
+      PORT: 8082
+      PRODUCT_SERVICE_URL: http://product-service:8081
+      WAREHOUSE_SERVICE_URL: http://warehouse-service:8084
+      CCA_SERVICE_URL: http://cca-service:8083
+      CART_DB_URL: http://cart-db-node1:8080
+      RMQ_HOST: rabbitmq
+      RMQ_PORT: 5672
+      RMQ_USER: guest
+      RMQ_PASS: guest
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck", "http://localhost:8082/shopping-cart/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+      cart-db-node1: { condition: service_healthy }
+      product-service: { condition: service_healthy }
+      warehouse-service: { condition: service_healthy }
+      cca-service: { condition: service_healthy }
+
+  identity-service:
+    <<: [*app, *service-limits]
+    container_name: identity-service
+    command: ["/usr/local/bin/identitysvc"]
+    ports: ["8085:8085", "9214:9100"]
+    environment:
+      <<: [*app-env, *auth-env]
+      PORT: 8085
+      CORE_DB_URL: http://core-db-node1:8080
+      REDIS_ADDR: redis:6379
+      ACCESS_TOKEN_TTL_MS: 900000
+      REFRESH_TOKEN_TTL_MS: 604800000
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck", "http://localhost:8085/identity/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      redis: { condition: service_healthy }
+      core-db-node1: { condition: service_healthy }
+      core-db-node2: { condition: service_healthy }
+      core-db-node3: { condition: service_healthy }
+
+  order-service:
+    <<: [*app, *service-limits]
+    container_name: order-service
+    command: ["/usr/local/bin/ordersvc"]
+    ports: ["8086:8086", "9215:9100"]
+    environment:
+      <<: *app-env
+      PORT: 8086
+      CORE_DB_URL: http://core-db-node1:8080
+      RMQ_HOST: rabbitmq
+      RMQ_PORT: 5672
+      RMQ_USER: guest
+      RMQ_PASS: guest
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck", "http://localhost:8086/orders/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+      core-db-node1: { condition: service_healthy }
+
+  notification-service:
+    <<: [*app, *service-limits]
+    container_name: notification-service
+    command: ["/usr/local/bin/notificationsvc"]
+    ports: ["8087:8087", "9216:9100"]
+    environment:
+      <<: *app-env
+      PORT: 8087
+      REDIS_ADDR: redis:6379
+      RMQ_HOST: rabbitmq
+      RMQ_PORT: 5672
+      RMQ_USER: guest
+      RMQ_PASS: guest
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck", "http://localhost:8087/notifications/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
+    depends_on:
+      redis: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+
+  # The front door. Everything else publishes a port for debugging, but this
+  # is the only one that would be exposed anywhere real.
+  gateway:
+    <<: [*app, *service-limits]
+    container_name: gateway
+    command: ["/usr/local/bin/gatewaysvc"]
+    ports: ["8080:8080", "9217:9100"]
+    environment:
+      <<: [*app-env, *auth-env]
+      PORT: 8080
+      IDENTITY_SERVICE_URL: http://identity-service:8085
+      PRODUCT_SERVICE_URL: http://product-service:8081
+      CART_SERVICE_URL: http://shopping-cart-service:8082
+      ORDER_SERVICE_URL: http://order-service:8086
+      NOTIFICATION_SERVICE_URL: http://notification-service:8087
+      REDIS_ADDR: redis:6379
+      RATE_LIMIT: ${RATE_LIMIT:-6000}
+      RATE_LIMIT_WINDOW_MS: 60000
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      redis: { condition: service_healthy }
+      identity-service: { condition: service_healthy }
+      product-service: { condition: service_healthy }
+      shopping-cart-service: { condition: service_healthy }
+      order-service: { condition: service_healthy }
+      notification-service: { condition: service_healthy }
+
+  # ── One-shot catalogue seeder (profile: seed) ─────────────────────────────
+  product-loader:
+    <<: *app
+    container_name: product-loader
+    profiles: [seed]
+    restart: "no"
+    command: ["/usr/local/bin/productloader", "-count", "${PRODUCT_COUNT:-1000}"]
+    environment:
+      <<: *app-env
+      PRODUCT_SERVICE_URL: http://product-service:8081
+    depends_on:
+      product-service: { condition: service_healthy }
+
+  # ── Observability (profile: observability) ────────────────────────────────
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    profiles: [observability]
+    restart: unless-stopped
+    networks: [mesh]
+    logging: *logging
+    ports: ["${PROMETHEUS_PORT:-9490}:9090"]
+    volumes:
+      - ./prometheus:/etc/prometheus:ro
+      - prometheus-data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=6h
+      - --web.enable-lifecycle
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    profiles: [observability]
+    restart: unless-stopped
+    networks: [mesh]
+    logging: *logging
+    ports: ["${GRAFANA_PORT:-3000}:3000"]
+    environment:
+      # Anonymous admin is fine for a throwaway local stack and saves a login
+      # step; it must never be copied into anything reachable from outside.
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      GF_USERS_DEFAULT_THEME: dark
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    depends_on: [prometheus]

@@ -1,0 +1,24 @@
+apiVersion: 1
+
+# Removed before being recreated, so provisioning stays idempotent even when
+# the definition changes. Grafana persists datasources in its own database and
+# matches them by uid on re-provision; without this, changing the uid leaves it
+# unable to find the old record and it gives up with "data source not found".
+deleteDatasources:
+  - name: Prometheus
+    orgId: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    # Pinned rather than auto-generated: the provisioned dashboards reference
+    # this datasource by uid, and an assigned-at-random one leaves every panel
+    # pointing at nothing.
+    uid: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false
+    jsonData:
+      timeInterval: 10s
+      httpMethod: POST
