@@ -1,0 +1,6 @@
+# Recorded tool output, not source.
+#
+# Marking it generated keeps the repository's language statistics about the
+# code rather than about a coverage report, and collapses these files in diffs
+# where a line-by-line review of captured output is never what anyone wants.
+evidence/** linguist-generated=true

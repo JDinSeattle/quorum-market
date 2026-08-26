@@ -2,6 +2,12 @@
 /bin/
 coverage.out
 
+# The annotated coverage report is generated with every evidence run and kept
+# locally, but not committed. GitHub does not render a checked-in HTML file, so
+# its only value is on the machine that produced it — and at ~450KB it would
+# otherwise be the largest thing in the repository, twice over.
+evidence/**/*.html
+
 # Stray binaries from 'go build ./cmd/x' without -o, which drops the executable
 # in the working directory and is easy to commit by accident.
 /gatewaysvc

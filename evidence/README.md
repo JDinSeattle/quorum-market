@@ -27,7 +27,7 @@ Start with `SUMMARY.md` in any run directory.
 | `05-tests.txt` | Every test, verbose, so each assertion is named |
 | `06-tests-race.txt` | The same suite under the race detector |
 | `07-coverage.txt` | Per-function coverage |
-| `08-coverage.html` | Annotated source |
+| `08-coverage.html` | Annotated source. Generated locally, not committed — GitHub will not render it and it is the largest file here |
 | `09-build.txt` | Every service cross-compiled for `linux/amd64` |
 | `10-terraform.txt` | Infrastructure formatting and validation |
 | `11-compose.txt` | Compose configuration and service list |
