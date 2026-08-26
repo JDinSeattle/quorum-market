@@ -69,7 +69,7 @@ jobs:
       - name: Coverage summary
         run: go tool cover -func=coverage.out | tail -1
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: coverage
@@ -179,7 +179,7 @@ jobs:
         if: always()
         run: ./scripts/collect-evidence.sh || true
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: evidence
