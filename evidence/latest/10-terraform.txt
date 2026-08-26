@@ -1,0 +1,3 @@
+$ bash -c cd terraform && '/opt/homebrew/bin/tofu' fmt -recursive -check && '/opt/homebrew/bin/tofu' init -backend=false >/dev/null && '/opt/homebrew/bin/tofu' validate && rm -rf .terraform .terraform.lock.hcl
+
+[32m[1mSuccess![0m The configuration is valid.[0m

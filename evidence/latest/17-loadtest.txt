@@ -1,0 +1,42 @@
+$ bash -c locust -f loadtest/locustfile.py --host 'http://localhost:8080' --headless         --users '20' --spawn-rate 5 --run-time '60s' --only-summary
+
+[2026-08-26 08:54:15,734] HOST/INFO/locust.main: Starting Locust 2.43.4
+[2026-08-26 08:54:15,736] HOST/INFO/locust.main: Run time limit set to 60 seconds
+[2026-08-26 08:54:15,737] HOST/INFO/locust.runners: Ramping to 20 users at a rate of 5.00 per second
+[2026-08-26 08:54:18,751] HOST/INFO/locust.runners: All users spawned: {"Shopper": 20} (20 total users)
+[2026-08-26 08:55:15,518] HOST/INFO/locust.main: --run-time limit reached, shutting down
+[2026-08-26 08:55:15,560] HOST/INFO/locust.main: Shutting down (exit code 0)
+Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+POST     /identity/register                                                                20     0(0.00%) |   2976    1848    3741   2800 |    0.33        0.00
+GET      /orders                                                                           40     0(0.00%) |      7       4      59      6 |    0.67        0.00
+GET      /product/{productId}                                                             929     0(0.00%) |    669      81    4265    600 |   15.53        0.00
+POST     /shopping-cart [create]                                                           57     0(0.00%) |      4       1      61      3 |    0.95        0.00
+POST     /shopping-cart/{cartId}/add-item                                                 146     0(0.00%) |   1410     409    3490   1300 |    2.44        0.00
+POST     /shopping-cart/{cartId}/checkout                                                   7     0(0.00%) |   1201     616    1828   1300 |    0.12        0.00
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+         Aggregated                                                                      1199     0(0.00%) |    747       1    4265    620 |   20.04        0.00
+
+Response time percentiles (approximated)
+Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+POST     /identity/register                                                                   3300   3500   3500   3600   3700   3700   3700   3700   3700   3700   3700     20
+GET      /orders                                                                                 6      7      7      7     10     21     59     59     59     59     59     40
+GET      /product/{productId}                                                                  600    740    820    900   1100   1200   1600   1900   4300   4300   4300    929
+POST     /shopping-cart [create]                                                                 3      3      3      4      5      9     16     62     62     62     62     57
+POST     /shopping-cart/{cartId}/add-item                                                     1300   1500   1700   1800   2000   2300   2800   2900   3500   3500   3500    146
+POST     /shopping-cart/{cartId}/checkout                                                     1300   1300   1500   1500   1800   1800   1800   1800   1800   1800   1800      7
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+         Aggregated                                                                            620    810    960   1000   1400   1800   2600   3300   3700   4300   4300   1199
+
+
+── session outcomes ─────────────────────────────
+  sessions          59
+  abandoned carts   32
+  checkouts placed  6
+  cards declined    1
+  out of stock      0
+  throttled         0
+  conversion rate   11.9% attempted checkout
+─────────────────────────────────────────────────
+

@@ -1,0 +1,33 @@
+$ go test ./... -race -count=1
+
+?   	github.com/JDinSeattle/quorum-market/cmd/cartsvc	[no test files]
+?   	github.com/JDinSeattle/quorum-market/cmd/ccasvc	[no test files]
+?   	github.com/JDinSeattle/quorum-market/cmd/gatewaysvc	[no test files]
+?   	github.com/JDinSeattle/quorum-market/cmd/healthcheck	[no test files]
+?   	github.com/JDinSeattle/quorum-market/cmd/identitysvc	[no test files]
+?   	github.com/JDinSeattle/quorum-market/cmd/kvnode	[no test files]
+?   	github.com/JDinSeattle/quorum-market/cmd/notificationsvc	[no test files]
+?   	github.com/JDinSeattle/quorum-market/cmd/ordersvc	[no test files]
+?   	github.com/JDinSeattle/quorum-market/cmd/productloader	[no test files]
+?   	github.com/JDinSeattle/quorum-market/cmd/productsvc	[no test files]
+?   	github.com/JDinSeattle/quorum-market/cmd/warehousesvc	[no test files]
+ok  	github.com/JDinSeattle/quorum-market/internal/auth	1.470s
+ok  	github.com/JDinSeattle/quorum-market/internal/busywait	1.883s
+ok  	github.com/JDinSeattle/quorum-market/internal/cache	3.391s
+ok  	github.com/JDinSeattle/quorum-market/internal/cart	1.649s
+ok  	github.com/JDinSeattle/quorum-market/internal/cca	1.820s
+?   	github.com/JDinSeattle/quorum-market/internal/envx	[no test files]
+ok  	github.com/JDinSeattle/quorum-market/internal/events	2.208s
+ok  	github.com/JDinSeattle/quorum-market/internal/gateway	2.697s
+ok  	github.com/JDinSeattle/quorum-market/internal/httpx	3.239s
+ok  	github.com/JDinSeattle/quorum-market/internal/identity	6.545s
+ok  	github.com/JDinSeattle/quorum-market/internal/kv	2.710s
+ok  	github.com/JDinSeattle/quorum-market/internal/notification	3.918s
+ok  	github.com/JDinSeattle/quorum-market/internal/obs	6.271s
+ok  	github.com/JDinSeattle/quorum-market/internal/order	4.693s
+?   	github.com/JDinSeattle/quorum-market/internal/orders	[no test files]
+ok  	github.com/JDinSeattle/quorum-market/internal/product	5.014s
+ok  	github.com/JDinSeattle/quorum-market/internal/ratelimit	14.983s
+?   	github.com/JDinSeattle/quorum-market/internal/redisx	[no test files]
+ok  	github.com/JDinSeattle/quorum-market/internal/rmq	4.670s
+ok  	github.com/JDinSeattle/quorum-market/internal/warehouse	4.631s

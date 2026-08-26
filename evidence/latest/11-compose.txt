@@ -1,0 +1,25 @@
+$ bash -c docker compose -f deploy/docker-compose.yml --profile observability --profile seed config >/dev/null && docker compose -f deploy/docker-compose.yml config --services | sort
+
+cart-db-node1
+cart-db-node2
+cart-db-node3
+cart-db-node4
+cart-db-node5
+cca-service
+core-db-node1
+core-db-node2
+core-db-node3
+gateway
+identity-service
+notification-service
+order-service
+product-db-follower1
+product-db-follower2
+product-db-follower3
+product-db-follower4
+product-db-leader
+product-service
+rabbitmq
+redis
+shopping-cart-service
+warehouse-service

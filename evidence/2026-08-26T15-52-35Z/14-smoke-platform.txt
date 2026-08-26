@@ -1,0 +1,60 @@
+$ ./scripts/smoke-platform.sh
+
+
+[1m1. the gateway is up[0m
+  [32mok[0m   gateway is answering
+
+[1m2. registration and login[0m
+  [32mok[0m   registered cust-3thnM8IhzK0
+  [32mok[0m   duplicate registration -> 409
+  [32mok[0m   login returns the same identity
+  [32mok[0m   wrong password -> 401
+
+[1m3. what the gateway lets through[0m
+  [32mok[0m   browsing is public
+  [32mok[0m   carts, orders and notifications require a token
+  [32mok[0m   forged tokens -> 401
+  [32mok[0m   spoofed identity headers are stripped
+
+[1m4. a purchase, end to end[0m
+  [32mok[0m   opened cart-cust-3thnM8IhzK0
+  [32mok[0m   added 2 units of p1
+  [32mok[0m   order ord-1787759649059-2da4177e92e5 placed through the gateway
+
+[1m5. one customer cannot touch another's cart[0m
+  [32mok[0m   reading someone else's cart -> 404
+  [32mok[0m   checking out someone else's cart -> 404
+
+[1m6. the order service learned about it from an event[0m
+  [32mok[0m   order history has 1 order(s), populated by order.placed
+  [32mok[0m   the recorded order matches the receipt
+  [32mok[0m   order advanced to shipped via order.shipped
+
+[1m7. an unrelated subscriber saw the same events[0m
+  [32mok[0m   2 notifications delivered from the same events
+  [32mok[0m   order.placed produced a message
+  [32mok[0m   order.shipped produced a message
+
+[1m8. cancelling[0m
+  [32mok[0m   cancelling a shipped order -> 409
+
+[1m9. the catalogue cache[0m
+  [32mok[0m   repeated reads are served from the cache (1691 -> 1695 hits)
+  [32mok[0m   missing products are negatively cached, so they stop reaching the database
+
+[1m10. logout[0m
+  [32mok[0m   logged out
+  [32mok[0m   the access token stopped working immediately
+  [32mok[0m   the refresh token was destroyed
+
+[1m11. observability across the new services[0m
+  [32mok[0m   identity: ready, metrics exported
+  [32mok[0m   order: ready, metrics exported
+  [32mok[0m   notification: ready, metrics exported
+  [32mok[0m   gateway: ready, metrics exported
+  [32mok[0m   authentication outcomes are recorded
+  [32mok[0m   rate limiter decisions are recorded
+  [32mok[0m   order lifecycle events are recorded
+
+[32mall platform smoke checks passed[0m
+

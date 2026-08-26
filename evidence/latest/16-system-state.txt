@@ -1,0 +1,99 @@
+── readiness ──
+gateway        {"status":"up","checks":{"identity-service":{"status":"up","optional":true,"tookMs":0},"notification-service":{"status":"up","optional":true,"tookMs":0},"order-service":{"status":"up","optional":true,"tookMs":0},"product-service":{"status":"up","optional":true,"tookMs":1},"redis":{"status":"up","optional":true,"tookMs":0},"shopping-cart-service":{"status":"up","optional":true,"tookMs":0}},"build":{"version":"ab9940e-dirty","commit":"ab9940e","buildDate":"2026-08-26T15:37:38Z","goVersion":"go1.26.7","platform":"linux/arm64"}}
+
+product        {"status":"up","checks":{"product-db":{"status":"up","optional":true,"tookMs":1},"redis":{"status":"up","optional":true,"tookMs":0}},"build":{"version":"ab9940e-dirty","commit":"ab9940e","buildDate":"2026-08-26T15:37:38Z","goVersion":"go1.26.7","platform":"linux/arm64"}}
+
+cart           {"status":"up","checks":{"cart-db":{"status":"up","optional":true,"tookMs":2},"credit-card-authorizer":{"status":"up","optional":true,"tookMs":2},"product-service":{"status":"up","optional":true,"tookMs":1},"rabbitmq":{"status":"up","optional":true,"tookMs":0},"warehouse-service":{"status":"up","optional":true,"tookMs":2}},"build":{"version":"ab9940e-dirty","commit":"ab9940e","buildDate":"2026-08-26T15:37:38Z","goVersion":"go1.26.7","platform":"linux/arm64"}}
+
+warehouse      {"status":"up","checks":{"rabbitmq":{"status":"up","optional":true,"tookMs":0}},"build":{"version":"ab9940e-dirty","commit":"ab9940e","buildDate":"2026-08-26T15:37:38Z","goVersion":"go1.26.7","platform":"linux/arm64"}}
+
+cca            {"status":"up","build":{"version":"ab9940e-dirty","commit":"ab9940e","buildDate":"2026-08-26T15:37:38Z","goVersion":"go1.26.7","platform":"linux/arm64"}}
+
+identity       {"status":"up","checks":{"core-db":{"status":"up","optional":true,"tookMs":1},"redis":{"status":"up","optional":true,"tookMs":0}},"build":{"version":"ab9940e-dirty","commit":"ab9940e","buildDate":"2026-08-26T15:37:38Z","goVersion":"go1.26.7","platform":"linux/arm64"}}
+
+order          {"status":"up","checks":{"core-db":{"status":"up","optional":true,"tookMs":0},"rabbitmq":{"status":"up","optional":true,"tookMs":0}},"build":{"version":"ab9940e-dirty","commit":"ab9940e","buildDate":"2026-08-26T15:37:38Z","goVersion":"go1.26.7","platform":"linux/arm64"}}
+
+notification   {"status":"up","checks":{"rabbitmq":{"status":"up","optional":true,"tookMs":0},"redis":{"status":"up","optional":true,"tookMs":0}},"build":{"version":"ab9940e-dirty","commit":"ab9940e","buildDate":"2026-08-26T15:37:38Z","goVersion":"go1.26.7","platform":"linux/arm64"}}
+
+
+── database clusters ──
+:9080 {"cluster_size":5,"keys":1004,"mode":"leader-follower","node_id":"product-db-leader","read_quorum":1,"read_repair":true,"role":"leader","sequential_replication":false,"strongly_consistent":true,"transactions":{"abandoned":0,"aborted":0,"committed":0,"open":0},"write_quorum":5}
+
+:9081 {"cluster_size":1,"keys":1004,"mode":"leader-follower","node_id":"product-db-follower1","read_quorum":1,"read_repair":true,"role":"follower","sequential_replication":false,"strongly_consistent":true,"transactions":{"abandoned":0,"aborted":0,"committed":0,"open":0},"write_quorum":5}
+
+:9082 {"cluster_size":1,"keys":1004,"mode":"leader-follower","node_id":"product-db-follower2","read_quorum":1,"read_repair":true,"role":"follower","sequential_replication":false,"strongly_consistent":true,"transactions":{"abandoned":0,"aborted":0,"committed":0,"open":0},"write_quorum":5}
+
+:9083 {"cluster_size":1,"keys":1004,"mode":"leader-follower","node_id":"product-db-follower3","read_quorum":1,"read_repair":true,"role":"follower","sequential_replication":false,"strongly_consistent":true,"transactions":{"abandoned":0,"aborted":0,"committed":0,"open":0},"write_quorum":5}
+
+:9084 {"cluster_size":1,"keys":1004,"mode":"leader-follower","node_id":"product-db-follower4","read_quorum":1,"read_repair":true,"role":"follower","sequential_replication":false,"strongly_consistent":true,"transactions":{"abandoned":0,"aborted":0,"committed":0,"open":0},"write_quorum":5}
+
+:9090 {"cluster_size":5,"keys":112,"mode":"leaderless","node_id":"cart-db-node1","read_quorum":3,"read_repair":true,"role":"leader","sequential_replication":false,"strongly_consistent":true,"transactions":{"abandoned":0,"aborted":1,"committed":22,"open":0},"write_quorum":3}
+
+:9091 {"cluster_size":5,"keys":112,"mode":"leaderless","node_id":"cart-db-node2","read_quorum":3,"read_repair":true,"role":"leader","sequential_replication":false,"strongly_consistent":true,"transactions":{"abandoned":0,"aborted":0,"committed":0,"open":0},"write_quorum":3}
+
+:9092 {"cluster_size":5,"keys":112,"mode":"leaderless","node_id":"cart-db-node3","read_quorum":3,"read_repair":true,"role":"leader","sequential_replication":false,"strongly_consistent":true,"transactions":{"abandoned":0,"aborted":0,"committed":0,"open":0},"write_quorum":3}
+
+:9093 {"cluster_size":5,"keys":112,"mode":"leaderless","node_id":"cart-db-node4","read_quorum":3,"read_repair":true,"role":"leader","sequential_replication":false,"strongly_consistent":true,"transactions":{"abandoned":0,"aborted":0,"committed":0,"open":0},"write_quorum":3}
+
+:9094 {"cluster_size":5,"keys":112,"mode":"leaderless","node_id":"cart-db-node5","read_quorum":3,"read_repair":true,"role":"leader","sequential_replication":false,"strongly_consistent":true,"transactions":{"abandoned":0,"aborted":0,"committed":0,"open":0},"write_quorum":3}
+
+:9095 {"cluster_size":3,"keys":158,"mode":"leaderless","node_id":"core-db-node1","read_quorum":2,"read_repair":true,"role":"leader","sequential_replication":false,"strongly_consistent":true,"transactions":{"abandoned":0,"aborted":0,"committed":0,"open":0},"write_quorum":2}
+
+:9096 {"cluster_size":3,"keys":158,"mode":"leaderless","node_id":"core-db-node2","read_quorum":2,"read_repair":true,"role":"leader","sequential_replication":false,"strongly_consistent":true,"transactions":{"abandoned":0,"aborted":0,"committed":0,"open":0},"write_quorum":2}
+
+:9097 {"cluster_size":3,"keys":158,"mode":"leaderless","node_id":"core-db-node3","read_quorum":2,"read_repair":true,"role":"leader","sequential_replication":false,"strongly_consistent":true,"transactions":{"abandoned":0,"aborted":0,"committed":0,"open":0},"write_quorum":2}
+
+
+── warehouse ledger ──
+{"expired":0,"oversold":0,"pending_reservations":0,"queue":{"dead_lettered":0,"dlq":"orders_queue.dlq","processed":22,"queue":"orders_queue","requeued":0},"rejected":0,"released":1,"reservation_ttl":"30s","reserved":23,"shipped":22,"shipped_uncompensated":0,"tracked_products":349}
+
+
+── redis keyspace ──
+# Keyspace
+db0:keys=736,expires=736,avg_ttl=239121227,subexpiry=0
+ 544 product:*
+ 136 session:refresh:*
+  37 notifications:*
+   4 session:revoked:*
+   2 ratelimit:gateway:customer:*
+   1 ratelimit:gateway:anon:*
+
+── queues ──
+[
+    {
+        "consumers": 10,
+        "messages": 0,
+        "messages_ready": 0,
+        "name": "notification-service.events"
+    },
+    {
+        "consumers": 0,
+        "messages": 0,
+        "messages_ready": 0,
+        "name": "notification-service.events.dlq"
+    },
+    {
+        "consumers": 10,
+        "messages": 0,
+        "messages_ready": 0,
+        "name": "order-service.events"
+    },
+    {
+        "consumers": 0,
+        "messages": 0,
+        "messages_ready": 0,
+        "name": "order-service.events.dlq"
+    },
+    {
+        "consumers": 10,
+        "messages": 0,
+        "messages_ready": 0,
+        "name": "orders_queue"
+    },
+    {
+        "consumers": 0,
+        "messages": 0,
+        "messages_ready": 0,
+        "name": "orders_queue.dlq"
+    }
+]

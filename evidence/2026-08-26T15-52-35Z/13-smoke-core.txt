@@ -1,0 +1,54 @@
+$ ./scripts/smoke.sh
+
+
+[1m1. waiting for services[0m
+  [32mok[0m   product service is up
+  [32mok[0m   cart service is up
+  [32mok[0m   cca service is up
+  [32mok[0m   warehouse is up
+
+[1m2. catalogue[0m
+  [32mok[0m   created smoke-widget-1787759640
+  [32mok[0m   read it back through the leader-follower cluster
+
+[1m3. inventory before[0m
+  [32mok[0m   stock is 100
+
+[1m4. add to cart[0m
+  [32mok[0m   opened cart cart-smoke-1787759640
+  [32mok[0m   added 3 units
+  [32mok[0m   cart total is 30 across the leaderless cluster
+
+[1m5. checkout[0m
+  [32mok[0m   order ord-1787759642768-5d62a19ffcd6 confirmed on attempt 1
+
+[1m6. side effects[0m
+  [32mok[0m   stock went 100 -> 97, deducted exactly once
+  [32mok[0m   cart was emptied
+  [32mok[0m   warehouse consumed the shipment (20 total)
+  [32mok[0m   no reservation left dangling
+  [32mok[0m   stock stayed at 97 after shipping
+
+[1m7. error paths[0m
+  [32mok[0m   unknown product -> 404
+  [32mok[0m   empty cart checkout -> 400
+  [32mok[0m   unknown product in cart -> 404
+
+[1m8. retry safety[0m
+  [32mok[0m   checkout with an idempotency key -> ord-1787759645456-d7adc9a2c43a
+  [32mok[0m   retrying with the same key replayed the original order
+  [32mok[0m   the retry reserved nothing further (97 -> 95)
+
+[1m9. observability[0m
+  [32mok[0m   product: healthy, ready, version ab9940e-dirty, metrics exported
+  [32mok[0m   cart: healthy, ready, version ab9940e-dirty, metrics exported
+  [32mok[0m   warehouse: healthy, ready, version ab9940e-dirty, metrics exported
+  [32mok[0m   checkout outcomes are being recorded
+  [32mok[0m   reservation outcomes are being recorded
+  [32mok[0m   request ids are honoured and echoed
+
+[1m10. dead-letter queue[0m
+  [32mok[0m   no orders were dead-lettered
+
+[32mall smoke checks passed[0m
+

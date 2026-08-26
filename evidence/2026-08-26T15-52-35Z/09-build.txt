@@ -1,0 +1,15 @@
+$ bash -c GOOS=linux GOARCH=amd64 go build -trimpath -o /tmp/evidence-bin/ ./cmd/... \
+     && for f in /tmp/evidence-bin/*; do printf "%-18s %10d bytes\n" "$(basename "$f")" "$(wc -c < "$f")"; done \
+     && rm -rf /tmp/evidence-bin
+
+cartsvc              17794459 bytes
+ccasvc               16152678 bytes
+gatewaysvc           26314320 bytes
+healthcheck           8462583 bytes
+identitysvc          26308848 bytes
+kvnode               16962511 bytes
+notificationsvc      26223364 bytes
+ordersvc             17678441 bytes
+productloader        15624632 bytes
+productsvc           26132612 bytes
+warehousesvc         16988622 bytes

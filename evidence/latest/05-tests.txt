@@ -1,0 +1,1003 @@
+$ go test ./... -count=1 -v
+
+?   	github.com/JDinSeattle/quorum-market/cmd/cartsvc	[no test files]
+?   	github.com/JDinSeattle/quorum-market/cmd/ccasvc	[no test files]
+?   	github.com/JDinSeattle/quorum-market/cmd/gatewaysvc	[no test files]
+?   	github.com/JDinSeattle/quorum-market/cmd/healthcheck	[no test files]
+?   	github.com/JDinSeattle/quorum-market/cmd/identitysvc	[no test files]
+?   	github.com/JDinSeattle/quorum-market/cmd/kvnode	[no test files]
+?   	github.com/JDinSeattle/quorum-market/cmd/notificationsvc	[no test files]
+?   	github.com/JDinSeattle/quorum-market/cmd/ordersvc	[no test files]
+?   	github.com/JDinSeattle/quorum-market/cmd/productloader	[no test files]
+?   	github.com/JDinSeattle/quorum-market/cmd/productsvc	[no test files]
+?   	github.com/JDinSeattle/quorum-market/cmd/warehousesvc	[no test files]
+=== RUN   TestIssuedTokensVerify
+--- PASS: TestIssuedTokensVerify (0.00s)
+=== RUN   TestShortSecretsAreRefused
+--- PASS: TestShortSecretsAreRefused (0.00s)
+=== RUN   TestTokensSignedWithAnotherKeyAreRejected
+--- PASS: TestTokensSignedWithAnotherKeyAreRejected (0.00s)
+=== RUN   TestExpiredTokensAreRejected
+--- PASS: TestExpiredTokensAreRejected (0.00s)
+=== RUN   TestTokensWithoutAnExpiryAreRejected
+--- PASS: TestTokensWithoutAnExpiryAreRejected (0.00s)
+=== RUN   TestTokensWithoutASubjectAreRejected
+--- PASS: TestTokensWithoutASubjectAreRejected (0.00s)
+=== RUN   TestTokensFromAnotherIssuerAreRejected
+--- PASS: TestTokensFromAnotherIssuerAreRejected (0.00s)
+=== RUN   TestAlgNoneIsRejected
+--- PASS: TestAlgNoneIsRejected (0.00s)
+=== RUN   TestMalformedTokensAreRejected
+--- PASS: TestMalformedTokensAreRejected (0.00s)
+=== RUN   TestRevokedSessionsAreRejected
+--- PASS: TestRevokedSessionsAreRejected (0.00s)
+=== RUN   TestRevocationOutageFailsOpen
+--- PASS: TestRevocationOutageFailsOpen (0.00s)
+=== RUN   TestBearerTokenParsing
+--- PASS: TestBearerTokenParsing (0.00s)
+PASS
+ok  	github.com/JDinSeattle/quorum-market/internal/auth	0.587s
+=== RUN   TestDelayStaysWithinBounds
+--- PASS: TestDelayStaysWithinBounds (0.00s)
+=== RUN   TestDelayIsSkewedTowardTheFastEnd
+--- PASS: TestDelayIsSkewedTowardTheFastEnd (0.00s)
+=== RUN   TestSimulateIsDisabledWhenMaxIsZero
+--- PASS: TestSimulateIsDisabledWhenMaxIsZero (0.00s)
+=== RUN   TestBurnSpendsRoughlyTheRequestedTime
+--- PASS: TestBurnSpendsRoughlyTheRequestedTime (0.12s)
+PASS
+ok  	github.com/JDinSeattle/quorum-market/internal/busywait	1.025s
+=== RUN   TestSecondReadIsServedFromTheCache
+--- PASS: TestSecondReadIsServedFromTheCache (0.00s)
+=== RUN   TestAbsencesAreRemembered
+--- PASS: TestAbsencesAreRemembered (0.00s)
+=== RUN   TestConcurrentMissesCollapseIntoOneLoad
+--- PASS: TestConcurrentMissesCollapseIntoOneLoad (0.10s)
+=== RUN   TestAnUnreachableCacheFallsThroughToTheLoader
+redis: 2026/08/26 08:52:50 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64260: connect: connection refused
+redis: 2026/08/26 08:52:50 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64260: connect: connection refused
+redis: 2026/08/26 08:52:51 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64260: connect: connection refused
+redis: 2026/08/26 08:52:51 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64260: connect: connection refused
+2026/08/26 08:52:51 WARN cache read failed, falling through to the loader cache=test key=k err="dial tcp 127.0.0.1:64260: connect: connection refused"
+--- PASS: TestAnUnreachableCacheFallsThroughToTheLoader (1.76s)
+=== RUN   TestInvalidationForcesAReload
+--- PASS: TestInvalidationForcesAReload (0.00s)
+=== RUN   TestEntriesExpire
+--- PASS: TestEntriesExpire (0.00s)
+=== RUN   TestANilClientDisablesCaching
+--- PASS: TestANilClientDisablesCaching (0.00s)
+=== RUN   TestLoaderFailuresAreNotCached
+--- PASS: TestLoaderFailuresAreNotCached (0.00s)
+=== RUN   TestAnAbandonedRequestIsNotACacheError
+--- PASS: TestAnAbandonedRequestIsNotACacheError (0.00s)
+PASS
+ok  	github.com/JDinSeattle/quorum-market/internal/cache	3.057s
+=== RUN   TestCheckoutHappyPath
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64100
+2026/08/26 08:52:49 INFO request method=PUT path=/product/p1 status=201 duration_ms=0 remote=127.0.0.1:64099
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64100
+2026/08/26 08:52:49 INFO request method=PUT path=/product/p2 status=201 duration_ms=0 remote=127.0.0.1:64099
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64100
+2026/08/26 08:52:49 INFO request method=GET path=/product/p1 status=200 duration_ms=0 remote=127.0.0.1:64099
+2026/08/26 08:52:49 INFO request method=GET path=/warehouse/inventory/p1 status=200 duration_ms=0 remote=127.0.0.1:64101
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64100
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64100
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64100
+2026/08/26 08:52:49 INFO request method=GET path=/product/p2 status=200 duration_ms=0 remote=127.0.0.1:64099
+2026/08/26 08:52:49 INFO request method=GET path=/warehouse/inventory/p2 status=200 duration_ms=0 remote=127.0.0.1:64101
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64100
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64100
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64100
+2026/08/26 08:52:49 INFO request method=POST path=/db/begin_transaction status=200 duration_ms=0 remote=127.0.0.1:64100
+2026/08/26 08:52:49 INFO request method=POST path=/warehouse/reserve status=200 duration_ms=0 remote=127.0.0.1:64101
+2026/08/26 08:52:49 INFO request method=POST path=/credit-card-authorizer/authorize status=200 duration_ms=0 remote=127.0.0.1:64102
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64100
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64100
+2026/08/26 08:52:49 INFO request method=POST path=/db/end_transaction status=200 duration_ms=0 remote=127.0.0.1:64100
+2026/08/26 08:52:49 INFO checkout committed txnId=9b309303-f8c6-405e-bf89-57fe5300de9c orderId=ord-1787759569311-781eb0c05c4c total=38.5
+2026/08/26 08:52:49 INFO shipment queued orderId=ord-1787759569311-781eb0c05c4c
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64100
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64100
+--- PASS: TestCheckoutHappyPath (0.01s)
+=== RUN   TestCheckoutDeclinedReleasesTheReservation
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64108
+2026/08/26 08:52:49 INFO request method=PUT path=/product/p1 status=201 duration_ms=0 remote=127.0.0.1:64107
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64108
+2026/08/26 08:52:49 INFO request method=GET path=/product/p1 status=200 duration_ms=0 remote=127.0.0.1:64107
+2026/08/26 08:52:49 INFO request method=GET path=/warehouse/inventory/p1 status=200 duration_ms=0 remote=127.0.0.1:64109
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64108
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64108
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64108
+2026/08/26 08:52:49 INFO request method=POST path=/db/begin_transaction status=200 duration_ms=0 remote=127.0.0.1:64108
+2026/08/26 08:52:49 INFO request method=POST path=/warehouse/reserve status=200 duration_ms=0 remote=127.0.0.1:64109
+2026/08/26 08:52:49 INFO request method=POST path=/credit-card-authorizer/authorize status=402 duration_ms=0 remote=127.0.0.1:64110
+2026/08/26 08:52:49 INFO checkout aborted: card declined txnId=eb67627c-8b44-409f-bb75-9b8f8f719f2e cartId=cart-alice
+2026/08/26 08:52:49 INFO request method=POST path=/warehouse/release status=200 duration_ms=0 remote=127.0.0.1:64109
+2026/08/26 08:52:49 INFO request method=POST path=/db/abort_transaction status=200 duration_ms=0 remote=127.0.0.1:64108
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64108
+--- PASS: TestCheckoutDeclinedReleasesTheReservation (0.00s)
+=== RUN   TestCheckoutOutOfStock
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64116
+2026/08/26 08:52:49 INFO request method=PUT path=/product/p1 status=201 duration_ms=0 remote=127.0.0.1:64115
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64116
+2026/08/26 08:52:49 INFO request method=GET path=/product/p1 status=200 duration_ms=0 remote=127.0.0.1:64115
+2026/08/26 08:52:49 INFO request method=GET path=/warehouse/inventory/p1 status=200 duration_ms=0 remote=127.0.0.1:64117
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64116
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64116
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64116
+2026/08/26 08:52:49 INFO request method=POST path=/db/begin_transaction status=200 duration_ms=0 remote=127.0.0.1:64116
+2026/08/26 08:52:49 INFO request method=POST path=/warehouse/reserve status=409 duration_ms=0 remote=127.0.0.1:64117
+2026/08/26 08:52:49 INFO checkout aborted: out of stock txnId=6d4ab595-e80f-41da-905c-20c97bb2b097 cartId=cart-alice
+2026/08/26 08:52:49 INFO request method=POST path=/db/abort_transaction status=200 duration_ms=0 remote=127.0.0.1:64116
+--- PASS: TestCheckoutOutOfStock (0.00s)
+=== RUN   TestCheckoutInvalidCardReleasesTheReservation
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64123
+2026/08/26 08:52:49 INFO request method=PUT path=/product/p1 status=201 duration_ms=0 remote=127.0.0.1:64122
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64123
+2026/08/26 08:52:49 INFO request method=GET path=/product/p1 status=200 duration_ms=0 remote=127.0.0.1:64122
+2026/08/26 08:52:49 INFO request method=GET path=/warehouse/inventory/p1 status=200 duration_ms=0 remote=127.0.0.1:64124
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64123
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64123
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64123
+2026/08/26 08:52:49 INFO request method=POST path=/db/begin_transaction status=200 duration_ms=0 remote=127.0.0.1:64123
+2026/08/26 08:52:49 INFO request method=POST path=/warehouse/reserve status=200 duration_ms=0 remote=127.0.0.1:64124
+2026/08/26 08:52:49 INFO request method=POST path=/credit-card-authorizer/authorize status=400 duration_ms=0 remote=127.0.0.1:64125
+2026/08/26 08:52:49 INFO request method=POST path=/warehouse/release status=200 duration_ms=0 remote=127.0.0.1:64124
+2026/08/26 08:52:49 INFO request method=POST path=/db/abort_transaction status=200 duration_ms=0 remote=127.0.0.1:64123
+--- PASS: TestCheckoutInvalidCardReleasesTheReservation (0.00s)
+=== RUN   TestCheckoutRejectsEmptyAndMissingCarts
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64130
+--- PASS: TestCheckoutRejectsEmptyAndMissingCarts (0.00s)
+=== RUN   TestCheckoutSucceedsEvenIfQueueingFails
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64136
+2026/08/26 08:52:49 INFO request method=PUT path=/product/p1 status=201 duration_ms=0 remote=127.0.0.1:64135
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64136
+2026/08/26 08:52:49 INFO request method=GET path=/product/p1 status=200 duration_ms=0 remote=127.0.0.1:64135
+2026/08/26 08:52:49 INFO request method=GET path=/warehouse/inventory/p1 status=200 duration_ms=0 remote=127.0.0.1:64137
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64136
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64136
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64136
+2026/08/26 08:52:49 INFO request method=POST path=/db/begin_transaction status=200 duration_ms=0 remote=127.0.0.1:64136
+2026/08/26 08:52:49 INFO request method=POST path=/warehouse/reserve status=200 duration_ms=0 remote=127.0.0.1:64137
+2026/08/26 08:52:49 INFO request method=POST path=/credit-card-authorizer/authorize status=200 duration_ms=0 remote=127.0.0.1:64138
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64136
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64136
+2026/08/26 08:52:49 INFO request method=POST path=/db/end_transaction status=200 duration_ms=0 remote=127.0.0.1:64136
+2026/08/26 08:52:49 INFO checkout committed txnId=1370631f-9721-438b-950c-9a608db14879 orderId=ord-1787759569320-757d73439df0 total=10
+2026/08/26 08:52:49 ERROR could not queue shipment orderId=ord-1787759569320-757d73439df0 reservationId=res-46a444fdbc8a74dde67f47eb5385d0e2 err="http: Handler timeout"
+--- PASS: TestCheckoutSucceedsEvenIfQueueingFails (0.00s)
+=== RUN   TestAddItemUnknownProduct
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64144
+2026/08/26 08:52:49 INFO request method=GET path=/product/ghost status=404 duration_ms=0 remote=127.0.0.1:64143
+--- PASS: TestAddItemUnknownProduct (0.00s)
+=== RUN   TestAddItemRejectsBadQuantities
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64150
+2026/08/26 08:52:49 INFO request method=PUT path=/product/p1 status=201 duration_ms=0 remote=127.0.0.1:64149
+--- PASS: TestAddItemRejectsBadQuantities (0.00s)
+=== RUN   TestAddItemCountsWhatIsAlreadyInTheCart
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64156
+2026/08/26 08:52:49 INFO request method=PUT path=/product/p1 status=201 duration_ms=0 remote=127.0.0.1:64155
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64156
+2026/08/26 08:52:49 INFO request method=GET path=/product/p1 status=200 duration_ms=0 remote=127.0.0.1:64155
+2026/08/26 08:52:49 INFO request method=GET path=/warehouse/inventory/p1 status=200 duration_ms=0 remote=127.0.0.1:64157
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64156
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64156
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64156
+2026/08/26 08:52:49 INFO request method=GET path=/product/p1 status=200 duration_ms=0 remote=127.0.0.1:64155
+2026/08/26 08:52:49 INFO request method=GET path=/warehouse/inventory/p1 status=200 duration_ms=0 remote=127.0.0.1:64157
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64156
+--- PASS: TestAddItemCountsWhatIsAlreadyInTheCart (0.00s)
+=== RUN   TestOneCustomerCannotActOnAnothersCart
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64163
+2026/08/26 08:52:49 INFO request method=PUT path=/product/p1 status=201 duration_ms=0 remote=127.0.0.1:64162
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64163
+2026/08/26 08:52:49 INFO request method=GET path=/product/p1 status=200 duration_ms=0 remote=127.0.0.1:64162
+2026/08/26 08:52:49 INFO request method=GET path=/warehouse/inventory/p1 status=200 duration_ms=0 remote=127.0.0.1:64164
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64163
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64163
+2026/08/26 08:52:49 INFO request method=GET path=/shopping-cart/cart-alice status=404 duration_ms=0 remote=192.0.2.1:1234
+2026/08/26 08:52:49 INFO request method=POST path=/shopping-cart/cart-alice/add-item status=404 duration_ms=0 remote=192.0.2.1:1234
+2026/08/26 08:52:49 INFO request method=POST path=/shopping-cart/cart-alice/checkout status=404 duration_ms=0 remote=192.0.2.1:1234
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64163
+--- PASS: TestOneCustomerCannotActOnAnothersCart (0.00s)
+=== RUN   TestAnAuthenticatedCallerCanUseTheirOwnCart
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64170
+2026/08/26 08:52:49 INFO request method=PUT path=/product/p1 status=201 duration_ms=0 remote=127.0.0.1:64169
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64170
+2026/08/26 08:52:49 INFO request method=GET path=/product/p1 status=200 duration_ms=0 remote=127.0.0.1:64169
+2026/08/26 08:52:49 INFO request method=GET path=/warehouse/inventory/p1 status=200 duration_ms=0 remote=127.0.0.1:64171
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64170
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64170
+2026/08/26 08:52:49 INFO request method=POST path=/shopping-cart/cart-alice/add-item status=200 duration_ms=1 remote=192.0.2.1:1234
+--- PASS: TestAnAuthenticatedCallerCanUseTheirOwnCart (0.00s)
+=== RUN   TestCartCreationIgnoresTheBodyWhenAuthenticated
+2026/08/26 08:52:49 INFO request method=POST path=/shopping-cart status=201 duration_ms=0 remote=192.0.2.1:1234
+--- PASS: TestCartCreationIgnoresTheBodyWhenAuthenticated (0.00s)
+=== RUN   TestRetryWithTheSameKeyReplaysTheReceipt
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64181
+2026/08/26 08:52:49 INFO request method=PUT path=/product/p1 status=201 duration_ms=0 remote=127.0.0.1:64180
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64181
+2026/08/26 08:52:49 INFO request method=GET path=/product/p1 status=200 duration_ms=0 remote=127.0.0.1:64180
+2026/08/26 08:52:49 INFO request method=GET path=/warehouse/inventory/p1 status=200 duration_ms=0 remote=127.0.0.1:64182
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64181
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64181
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64181
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64181
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64181
+2026/08/26 08:52:49 INFO request method=POST path=/db/begin_transaction status=200 duration_ms=0 remote=127.0.0.1:64181
+2026/08/26 08:52:49 INFO request method=POST path=/warehouse/reserve status=200 duration_ms=0 remote=127.0.0.1:64182
+2026/08/26 08:52:49 INFO request method=POST path=/credit-card-authorizer/authorize status=200 duration_ms=0 remote=127.0.0.1:64183
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64181
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64181
+2026/08/26 08:52:49 INFO request method=POST path=/db/end_transaction status=200 duration_ms=0 remote=127.0.0.1:64181
+2026/08/26 08:52:49 INFO checkout committed txnId=e36fe2ea-7d71-41c3-bdc9-a69bb0c7841f orderId=ord-1787759569330-169e59fc8486 total=40
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64181
+2026/08/26 08:52:49 INFO shipment queued orderId=ord-1787759569330-169e59fc8486
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64181
+2026/08/26 08:52:49 INFO replaying a completed checkout key=checkout-attempt-1 orderId=ord-1787759569330-169e59fc8486
+--- PASS: TestRetryWithTheSameKeyReplaysTheReceipt (0.00s)
+=== RUN   TestWithoutAKeyEachRequestIsANewOrder
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64189
+2026/08/26 08:52:49 INFO request method=PUT path=/product/p1 status=201 duration_ms=0 remote=127.0.0.1:64188
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64189
+2026/08/26 08:52:49 INFO request method=GET path=/product/p1 status=200 duration_ms=0 remote=127.0.0.1:64188
+2026/08/26 08:52:49 INFO request method=GET path=/warehouse/inventory/p1 status=200 duration_ms=0 remote=127.0.0.1:64190
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64189
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64189
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64189
+2026/08/26 08:52:49 INFO request method=POST path=/db/begin_transaction status=200 duration_ms=0 remote=127.0.0.1:64189
+2026/08/26 08:52:49 INFO request method=POST path=/warehouse/reserve status=200 duration_ms=0 remote=127.0.0.1:64190
+2026/08/26 08:52:49 INFO request method=POST path=/credit-card-authorizer/authorize status=200 duration_ms=0 remote=127.0.0.1:64191
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64189
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64189
+2026/08/26 08:52:49 INFO request method=POST path=/db/end_transaction status=200 duration_ms=0 remote=127.0.0.1:64189
+2026/08/26 08:52:49 INFO checkout committed txnId=3a52916c-c29d-4b94-980e-14c7c52b75f6 orderId=ord-1787759569332-621d1a26bfbf total=40
+2026/08/26 08:52:49 INFO shipment queued orderId=ord-1787759569332-621d1a26bfbf
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64189
+2026/08/26 08:52:49 INFO request method=GET path=/product/p1 status=200 duration_ms=0 remote=127.0.0.1:64188
+2026/08/26 08:52:49 INFO request method=GET path=/warehouse/inventory/p1 status=200 duration_ms=0 remote=127.0.0.1:64190
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64189
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64189
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64189
+2026/08/26 08:52:49 INFO request method=POST path=/db/begin_transaction status=200 duration_ms=0 remote=127.0.0.1:64189
+2026/08/26 08:52:49 INFO request method=POST path=/warehouse/reserve status=200 duration_ms=0 remote=127.0.0.1:64190
+2026/08/26 08:52:49 INFO request method=POST path=/credit-card-authorizer/authorize status=200 duration_ms=0 remote=127.0.0.1:64191
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64189
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64189
+2026/08/26 08:52:49 INFO request method=POST path=/db/end_transaction status=200 duration_ms=0 remote=127.0.0.1:64189
+2026/08/26 08:52:49 INFO checkout committed txnId=fb60baf8-21f8-4f86-b62c-ff620756dda8 orderId=ord-1787759569334-e1e12f02c1cb total=40
+2026/08/26 08:52:49 INFO shipment queued orderId=ord-1787759569334-e1e12f02c1cb
+--- PASS: TestWithoutAKeyEachRequestIsANewOrder (0.00s)
+=== RUN   TestDifferentKeysProduceDifferentOrders
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64197
+2026/08/26 08:52:49 INFO request method=PUT path=/product/p1 status=201 duration_ms=1 remote=127.0.0.1:64196
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64197
+2026/08/26 08:52:49 INFO request method=GET path=/product/p1 status=200 duration_ms=0 remote=127.0.0.1:64196
+2026/08/26 08:52:49 INFO request method=GET path=/warehouse/inventory/p1 status=200 duration_ms=0 remote=127.0.0.1:64198
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64197
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64197
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64197
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64197
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64197
+2026/08/26 08:52:49 INFO request method=POST path=/db/begin_transaction status=200 duration_ms=0 remote=127.0.0.1:64197
+2026/08/26 08:52:49 INFO request method=POST path=/warehouse/reserve status=200 duration_ms=0 remote=127.0.0.1:64198
+2026/08/26 08:52:49 INFO request method=POST path=/credit-card-authorizer/authorize status=200 duration_ms=0 remote=127.0.0.1:64199
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64197
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64197
+2026/08/26 08:52:49 INFO request method=POST path=/db/end_transaction status=200 duration_ms=0 remote=127.0.0.1:64197
+2026/08/26 08:52:49 INFO checkout committed txnId=cc6ebfb9-f744-45ef-8b26-997aa564f863 orderId=ord-1787759569337-b94de4d502a2 total=20
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64197
+2026/08/26 08:52:49 INFO shipment queued orderId=ord-1787759569337-b94de4d502a2
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64197
+2026/08/26 08:52:49 INFO request method=GET path=/product/p1 status=200 duration_ms=0 remote=127.0.0.1:64196
+2026/08/26 08:52:49 INFO request method=GET path=/warehouse/inventory/p1 status=200 duration_ms=0 remote=127.0.0.1:64198
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64197
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64197
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64197
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64197
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64197
+2026/08/26 08:52:49 INFO request method=POST path=/db/begin_transaction status=200 duration_ms=0 remote=127.0.0.1:64197
+2026/08/26 08:52:49 INFO request method=POST path=/warehouse/reserve status=200 duration_ms=0 remote=127.0.0.1:64198
+2026/08/26 08:52:49 INFO request method=POST path=/credit-card-authorizer/authorize status=200 duration_ms=0 remote=127.0.0.1:64199
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64197
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64197
+2026/08/26 08:52:49 INFO request method=POST path=/db/end_transaction status=200 duration_ms=0 remote=127.0.0.1:64197
+2026/08/26 08:52:49 INFO checkout committed txnId=d1d83991-b0fd-44b9-9e22-ef19e0ba371a orderId=ord-1787759569339-1a16113ae360 total=20
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64197
+2026/08/26 08:52:49 INFO shipment queued orderId=ord-1787759569339-1a16113ae360
+--- PASS: TestDifferentKeysProduceDifferentOrders (0.01s)
+=== RUN   TestAKeyCannotBeReusedForAnotherCart
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64205
+2026/08/26 08:52:49 INFO request method=PUT path=/product/p1 status=201 duration_ms=0 remote=127.0.0.1:64204
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64205
+2026/08/26 08:52:49 INFO request method=GET path=/product/p1 status=200 duration_ms=0 remote=127.0.0.1:64204
+2026/08/26 08:52:49 INFO request method=GET path=/warehouse/inventory/p1 status=200 duration_ms=0 remote=127.0.0.1:64206
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64205
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64205
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64205
+2026/08/26 08:52:49 INFO request method=GET path=/product/p1 status=200 duration_ms=0 remote=127.0.0.1:64204
+2026/08/26 08:52:49 INFO request method=GET path=/warehouse/inventory/p1 status=200 duration_ms=0 remote=127.0.0.1:64206
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64205
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64205
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64205
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64205
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64205
+2026/08/26 08:52:49 INFO request method=POST path=/db/begin_transaction status=200 duration_ms=0 remote=127.0.0.1:64205
+2026/08/26 08:52:49 INFO request method=POST path=/warehouse/reserve status=200 duration_ms=0 remote=127.0.0.1:64206
+2026/08/26 08:52:49 INFO request method=POST path=/credit-card-authorizer/authorize status=200 duration_ms=0 remote=127.0.0.1:64207
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64205
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64205
+2026/08/26 08:52:49 INFO request method=POST path=/db/end_transaction status=200 duration_ms=0 remote=127.0.0.1:64205
+2026/08/26 08:52:49 INFO checkout committed txnId=d6fb91b5-2d15-4bdc-a7bb-7a23f61c50d8 orderId=ord-1787759569343-02fca3fdc3c9 total=20
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64205
+2026/08/26 08:52:49 INFO shipment queued orderId=ord-1787759569343-02fca3fdc3c9
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64205
+--- PASS: TestAKeyCannotBeReusedForAnotherCart (0.00s)
+=== RUN   TestAnInFlightClaimBlocksADuplicate
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64213
+2026/08/26 08:52:49 INFO request method=PUT path=/product/p1 status=201 duration_ms=0 remote=127.0.0.1:64212
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64213
+2026/08/26 08:52:49 INFO request method=GET path=/product/p1 status=200 duration_ms=0 remote=127.0.0.1:64212
+2026/08/26 08:52:49 INFO request method=GET path=/warehouse/inventory/p1 status=200 duration_ms=0 remote=127.0.0.1:64214
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64213
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64213
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64213
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64213
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64213
+--- PASS: TestAnInFlightClaimBlocksADuplicate (0.00s)
+=== RUN   TestAFailedCheckoutGivesTheKeyBack
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64220
+2026/08/26 08:52:49 INFO request method=PUT path=/product/p1 status=201 duration_ms=0 remote=127.0.0.1:64219
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64220
+2026/08/26 08:52:49 INFO request method=GET path=/product/p1 status=200 duration_ms=0 remote=127.0.0.1:64219
+2026/08/26 08:52:49 INFO request method=GET path=/warehouse/inventory/p1 status=200 duration_ms=0 remote=127.0.0.1:64221
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64220
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64220
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64220
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64220
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64220
+2026/08/26 08:52:49 INFO request method=POST path=/db/begin_transaction status=200 duration_ms=0 remote=127.0.0.1:64220
+2026/08/26 08:52:49 INFO request method=POST path=/warehouse/reserve status=200 duration_ms=0 remote=127.0.0.1:64221
+2026/08/26 08:52:49 INFO request method=POST path=/credit-card-authorizer/authorize status=402 duration_ms=0 remote=127.0.0.1:64222
+2026/08/26 08:52:49 INFO checkout aborted: card declined txnId=f637f4ca-4b7e-448f-b014-7a18cfdb2875 cartId=cart-alice
+2026/08/26 08:52:49 INFO request method=POST path=/warehouse/release status=200 duration_ms=0 remote=127.0.0.1:64221
+2026/08/26 08:52:49 INFO request method=POST path=/db/abort_transaction status=200 duration_ms=0 remote=127.0.0.1:64220
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64220
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64220
+2026/08/26 08:52:49 WARN taking over an abandoned idempotency claim key=retry-me cartId=cart-alice age=2m0.00016s
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64220
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64220
+2026/08/26 08:52:49 INFO request method=POST path=/db/begin_transaction status=200 duration_ms=0 remote=127.0.0.1:64220
+2026/08/26 08:52:49 INFO request method=POST path=/warehouse/reserve status=200 duration_ms=0 remote=127.0.0.1:64221
+2026/08/26 08:52:49 INFO request method=POST path=/credit-card-authorizer/authorize status=402 duration_ms=0 remote=127.0.0.1:64222
+2026/08/26 08:52:49 INFO checkout aborted: card declined txnId=509f42bc-94d9-417b-ac92-bc1221b8c14e cartId=cart-alice
+2026/08/26 08:52:49 INFO request method=POST path=/warehouse/release status=200 duration_ms=0 remote=127.0.0.1:64221
+2026/08/26 08:52:49 INFO request method=POST path=/db/abort_transaction status=200 duration_ms=0 remote=127.0.0.1:64220
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64220
+--- PASS: TestAFailedCheckoutGivesTheKeyBack (0.00s)
+=== RUN   TestIdempotencyKeysAreValidated
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64228
+2026/08/26 08:52:49 INFO request method=PUT path=/product/p1 status=201 duration_ms=0 remote=127.0.0.1:64227
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64228
+2026/08/26 08:52:49 INFO request method=GET path=/product/p1 status=200 duration_ms=0 remote=127.0.0.1:64227
+2026/08/26 08:52:49 INFO request method=GET path=/warehouse/inventory/p1 status=200 duration_ms=0 remote=127.0.0.1:64229
+2026/08/26 08:52:49 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64228
+2026/08/26 08:52:49 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64228
+--- PASS: TestIdempotencyKeysAreValidated (0.00s)
+=== RUN   TestAddOrMergeFoldsRepeatedProducts
+--- PASS: TestAddOrMergeFoldsRepeatedProducts (0.00s)
+=== RUN   TestAddOrMergeRefreshesTheSnapshot
+--- PASS: TestAddOrMergeRefreshesTheSnapshot (0.00s)
+=== RUN   TestTotalsRoundToCents
+--- PASS: TestTotalsRoundToCents (0.00s)
+=== RUN   TestCartIDRoundTrip
+--- PASS: TestCartIDRoundTrip (0.00s)
+=== RUN   TestCustomerForRejectsMalformedIDs
+--- PASS: TestCustomerForRejectsMalformedIDs (0.00s)
+=== RUN   TestOrderItemsDropPricing
+--- PASS: TestOrderItemsDropPricing (0.00s)
+PASS
+ok  	github.com/JDinSeattle/quorum-market/internal/cart	0.806s
+=== RUN   TestValidCardNumber
+--- PASS: TestValidCardNumber (0.00s)
+PASS
+ok  	github.com/JDinSeattle/quorum-market/internal/cca	0.377s
+?   	github.com/JDinSeattle/quorum-market/internal/envx	[no test files]
+=== RUN   TestEnvelopeRoundTrip
+--- PASS: TestEnvelopeRoundTrip (0.00s)
+=== RUN   TestDecodeRejectsAnEmptyPayload
+--- PASS: TestDecodeRejectsAnEmptyPayload (0.00s)
+=== RUN   TestSubscribeRestoresTheCorrelationID
+--- PASS: TestSubscribeRestoresTheCorrelationID (0.00s)
+=== RUN   TestMalformedEventsAreDropped
+--- PASS: TestMalformedEventsAreDropped (0.00s)
+=== RUN   TestARouterIgnoresUnknownEventTypes
+--- PASS: TestARouterIgnoresUnknownEventTypes (0.00s)
+=== RUN   TestARouterDispatchesByType
+--- PASS: TestARouterDispatchesByType (0.00s)
+=== RUN   TestRouterPatternsAreStableAndComplete
+--- PASS: TestRouterPatternsAreStableAndComplete (0.00s)
+=== RUN   TestHandlerErrorsPropagateForRedelivery
+--- PASS: TestHandlerErrorsPropagateForRedelivery (0.00s)
+=== RUN   TestANilPublisherIsHarmless
+--- PASS: TestANilPublisherIsHarmless (0.00s)
+PASS
+ok  	github.com/JDinSeattle/quorum-market/internal/events	2.337s
+=== RUN   TestSpoofedIdentityHeadersAreStripped
+2026/08/26 08:52:50 INFO request method=GET path=/orders status=200 duration_ms=1 remote=192.0.2.1:1234
+--- PASS: TestSpoofedIdentityHeadersAreStripped (0.00s)
+=== RUN   TestSpoofedHeadersAreStrippedOnPublicRoutes
+2026/08/26 08:52:50 INFO request method=GET path=/product/p1 status=200 duration_ms=1 remote=192.0.2.1:1234
+--- PASS: TestSpoofedHeadersAreStrippedOnPublicRoutes (0.00s)
+=== RUN   TestPublicRoutesDoNotRequireAToken
+2026/08/26 08:52:50 INFO request method=GET path=/product/p1 status=200 duration_ms=0 remote=192.0.2.1:1234
+--- PASS: TestPublicRoutesDoNotRequireAToken (0.00s)
+=== RUN   TestProtectedRoutesRequireAValidToken
+2026/08/26 08:52:50 INFO request method=POST path=/shopping-cart status=401 duration_ms=0 remote=192.0.2.1:1234
+2026/08/26 08:52:50 INFO request method=POST path=/shopping-cart status=401 duration_ms=0 remote=192.0.2.1:1234
+2026/08/26 08:52:50 INFO request method=POST path=/shopping-cart status=401 duration_ms=0 remote=192.0.2.1:1234
+--- PASS: TestProtectedRoutesRequireAValidToken (0.00s)
+=== RUN   TestVerifiedIdentityIsPassedDownstream
+2026/08/26 08:52:50 INFO request method=GET path=/orders status=200 duration_ms=0 remote=192.0.2.1:1234
+--- PASS: TestVerifiedIdentityIsPassedDownstream (0.00s)
+=== RUN   TestThrottledRequestsAreRefusedWithGuidance
+2026/08/26 08:52:50 INFO request method=GET path=/product/p1 status=200 duration_ms=2 remote=192.0.2.1:1234
+2026/08/26 08:52:50 INFO request method=GET path=/product/p1 status=200 duration_ms=0 remote=192.0.2.1:1234
+2026/08/26 08:52:50 WARN request throttled identity=anon:192.0.2.1 path=/product/p1
+2026/08/26 08:52:50 INFO request method=GET path=/product/p1 status=429 duration_ms=0 remote=192.0.2.1:1234
+--- PASS: TestThrottledRequestsAreRefusedWithGuidance (0.00s)
+=== RUN   TestAnUnreachableUpstreamIsReportedAsABadGateway
+2026/08/26 08:52:50 ERROR upstream call failed route=product path=/product/p1 err="dial tcp 127.0.0.1:1: connect: connection refused"
+2026/08/26 08:52:50 ERROR request failed path=/product/p1 status=502 err="502: product is not responding"
+2026/08/26 08:52:50 ERROR request method=GET path=/product/p1 status=502 duration_ms=0 remote=192.0.2.1:1234
+--- PASS: TestAnUnreachableUpstreamIsReportedAsABadGateway (0.00s)
+=== RUN   TestUnroutedPathsAreNotFound
+2026/08/26 08:52:50 INFO request method=GET path=/does-not-exist status=404 duration_ms=0 remote=192.0.2.1:1234
+--- PASS: TestUnroutedPathsAreNotFound (0.00s)
+=== RUN   TestAGatewayNeedsRoutes
+--- PASS: TestAGatewayNeedsRoutes (0.00s)
+PASS
+ok  	github.com/JDinSeattle/quorum-market/internal/gateway	1.642s
+=== RUN   TestBreakerOpensAfterConsecutiveFailures
+--- PASS: TestBreakerOpensAfterConsecutiveFailures (0.00s)
+=== RUN   TestBreakerResetsOnSuccess
+--- PASS: TestBreakerResetsOnSuccess (0.00s)
+=== RUN   TestBreakerRecoversThroughHalfOpen
+--- PASS: TestBreakerRecoversThroughHalfOpen (0.02s)
+=== RUN   TestBreakerReopensWhenTheProbeFails
+--- PASS: TestBreakerReopensWhenTheProbeFails (0.02s)
+=== RUN   TestOnlyUnavailabilityCountsAgainstTheBreaker
+--- PASS: TestOnlyUnavailabilityCountsAgainstTheBreaker (0.00s)
+=== RUN   TestClientRetriesIdempotentRequests
+--- PASS: TestClientRetriesIdempotentRequests (0.01s)
+=== RUN   TestClientNeverRetriesPost
+--- PASS: TestClientNeverRetriesPost (0.00s)
+=== RUN   TestClientDoesNotRetryClientErrors
+--- PASS: TestClientDoesNotRetryClientErrors (0.00s)
+=== RUN   TestClientStopsAtMaxAttempts
+--- PASS: TestClientStopsAtMaxAttempts (0.00s)
+=== RUN   TestClientPropagatesTheRequestID
+--- PASS: TestClientPropagatesTheRequestID (0.00s)
+=== RUN   TestClientShortCircuitsWhenTheBreakerOpens
+--- PASS: TestClientShortCircuitsWhenTheBreakerOpens (0.00s)
+=== RUN   TestClientRespectsContextCancellation
+--- PASS: TestClientRespectsContextCancellation (0.05s)
+=== RUN   TestClientReportsMalformedResponses
+--- PASS: TestClientReportsMalformedResponses (0.00s)
+=== RUN   TestClientIsSafeForConcurrentUse
+--- PASS: TestClientIsSafeForConcurrentUse (0.01s)
+=== RUN   TestRouterAnswersUnmatchedPaths
+2026/08/26 08:52:50 INFO request method=GET path=/nowhere status=404 duration_ms=0 remote=192.0.2.1:1234
+--- PASS: TestRouterAnswersUnmatchedPaths (0.00s)
+=== RUN   TestRouterMatchesPathParameters
+2026/08/26 08:52:50 INFO request method=GET path=/thing/abc status=200 duration_ms=0 remote=192.0.2.1:1234
+--- PASS: TestRouterMatchesPathParameters (0.00s)
+=== RUN   TestRouteLabelStripsTheMethod
+--- PASS: TestRouteLabelStripsTheMethod (0.00s)
+=== RUN   TestRequestIDHonoursAValidInboundID
+--- PASS: TestRequestIDHonoursAValidInboundID (0.00s)
+=== RUN   TestRequestIDRejectsHostileInput
+--- PASS: TestRequestIDRejectsHostileInput (0.00s)
+=== RUN   TestRecovererTurnsPanicsIntoErrors
+2026/08/26 08:52:50 ERROR handler panicked path=/ panic="something went very wrong"
+--- PASS: TestRecovererTurnsPanicsIntoErrors (0.00s)
+=== RUN   TestLimiterShedsBeyondCapacity
+--- PASS: TestLimiterShedsBeyondCapacity (0.00s)
+=== RUN   TestLimiterAlwaysAdmitsProbes
+--- PASS: TestLimiterAlwaysAdmitsProbes (0.00s)
+=== RUN   TestLimiterOfZeroIsDisabled
+--- PASS: TestLimiterOfZeroIsDisabled (0.00s)
+=== RUN   TestWriteErrorHidesInternalDetail
+2026/08/26 08:52:50 INFO request method=GET path=/svc/work status=200 duration_ms=0 remote=192.0.2.1:1234
+2026/08/26 08:52:50 ERROR request failed path=/ status=500 err="500: could not reach the ledger: dial tcp 10.0.10.22:5432: connection refused"
+--- PASS: TestWriteErrorHidesInternalDetail (0.00s)
+=== RUN   TestWriteErrorKeepsClientMessages
+--- PASS: TestWriteErrorKeepsClientMessages (0.00s)
+=== RUN   TestDecodeJSONRejectsUnknownFields
+--- PASS: TestDecodeJSONRejectsUnknownFields (0.00s)
+PASS
+ok  	github.com/JDinSeattle/quorum-market/internal/httpx	2.106s
+=== RUN   TestRegisterThenLogin
+2026/08/26 08:52:51 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64367
+2026/08/26 08:52:51 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64367
+2026/08/26 08:52:51 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64367
+2026/08/26 08:52:51 INFO account created customerId=cust-ROWGlyMABek
+2026/08/26 08:52:51 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64367
+2026/08/26 08:52:51 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64367
+--- PASS: TestRegisterThenLogin (0.01s)
+=== RUN   TestPasswordsAreNeverStoredInTheClear
+2026/08/26 08:52:51 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64371
+2026/08/26 08:52:51 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64371
+2026/08/26 08:52:51 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64371
+2026/08/26 08:52:51 INFO account created customerId=cust-FciiHGvHcmY
+2026/08/26 08:52:51 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64371
+--- PASS: TestPasswordsAreNeverStoredInTheClear (0.00s)
+=== RUN   TestDuplicateRegistrationIsRefused
+2026/08/26 08:52:51 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64375
+2026/08/26 08:52:51 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64375
+2026/08/26 08:52:51 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64375
+2026/08/26 08:52:51 INFO account created customerId=cust-Low2Ao39GpE
+2026/08/26 08:52:51 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64375
+2026/08/26 08:52:51 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64375
+--- PASS: TestDuplicateRegistrationIsRefused (0.00s)
+=== RUN   TestLoginFailuresAreIndistinguishable
+2026/08/26 08:52:51 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64379
+2026/08/26 08:52:51 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64379
+2026/08/26 08:52:51 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64379
+2026/08/26 08:52:51 INFO account created customerId=cust-BqD9r5xWFc0
+2026/08/26 08:52:51 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64379
+2026/08/26 08:52:51 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64379
+2026/08/26 08:52:51 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64379
+--- PASS: TestLoginFailuresAreIndistinguishable (0.30s)
+=== RUN   TestWeakCredentialsAreRefused
+--- PASS: TestWeakCredentialsAreRefused (0.00s)
+=== RUN   TestRefreshTokensRotate
+2026/08/26 08:52:51 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64395
+2026/08/26 08:52:51 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64395
+2026/08/26 08:52:51 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64395
+2026/08/26 08:52:51 INFO account created customerId=cust-3wc3h_zNl3k
+2026/08/26 08:52:51 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64395
+--- PASS: TestRefreshTokensRotate (0.00s)
+=== RUN   TestUnknownRefreshTokensAreRefused
+--- PASS: TestUnknownRefreshTokensAreRefused (0.00s)
+=== RUN   TestLogoutRevokesTheSessionImmediately
+2026/08/26 08:52:51 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64402
+2026/08/26 08:52:51 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64402
+2026/08/26 08:52:51 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64402
+2026/08/26 08:52:51 INFO account created customerId=cust-7wegqYcARvo
+--- PASS: TestLogoutRevokesTheSessionImmediately (0.00s)
+=== RUN   TestLogoutOnlyEndsItsOwnSession
+2026/08/26 08:52:51 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64406
+2026/08/26 08:52:51 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64406
+2026/08/26 08:52:51 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64406
+2026/08/26 08:52:51 INFO account created customerId=cust-dJdpM9-_Cmk
+2026/08/26 08:52:51 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64406
+2026/08/26 08:52:51 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64406
+2026/08/26 08:52:51 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64406
+2026/08/26 08:52:51 INFO account created customerId=cust-MDhXM74LJP4
+--- PASS: TestLogoutOnlyEndsItsOwnSession (0.00s)
+=== RUN   TestProfileLookup
+2026/08/26 08:52:51 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64410
+2026/08/26 08:52:51 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64410
+2026/08/26 08:52:51 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64410
+2026/08/26 08:52:51 INFO account created customerId=cust-rCjjoRZSfo8
+2026/08/26 08:52:51 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64410
+2026/08/26 08:52:51 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64410
+--- PASS: TestProfileLookup (0.00s)
+PASS
+ok  	github.com/JDinSeattle/quorum-market/internal/identity	3.081s
+=== RUN   TestLeaderlessQuorumReadSeesQuorumWrite
+2026/08/26 08:52:51 INFO request method=PUT path=/internal/kv status=204 duration_ms=0 remote=127.0.0.1:64419
+2026/08/26 08:52:51 INFO request method=PUT path=/internal/kv status=204 duration_ms=0 remote=127.0.0.1:64418
+2026/08/26 08:52:51 INFO request method=PUT path=/internal/kv status=204 duration_ms=0 remote=127.0.0.1:64417
+2026/08/26 08:52:51 INFO request method=PUT path=/internal/kv status=204 duration_ms=0 remote=127.0.0.1:64420
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64420
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64417
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64418
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64419
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64422
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64421
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64424
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64423
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64426
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64425
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64427
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64428
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64429
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64430
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64431
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64432
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64433
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64435
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64436
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64434
+--- PASS: TestLeaderlessQuorumReadSeesQuorumWrite (0.00s)
+=== RUN   TestLeaderlessWritesFromDifferentCoordinatorsConverge
+2026/08/26 08:52:51 INFO request method=PUT path=/internal/kv status=204 duration_ms=0 remote=127.0.0.1:64443
+2026/08/26 08:52:51 INFO request method=PUT path=/internal/kv status=204 duration_ms=0 remote=127.0.0.1:64442
+2026/08/26 08:52:51 INFO request method=PUT path=/internal/kv status=204 duration_ms=0 remote=127.0.0.1:64445
+2026/08/26 08:52:51 INFO request method=PUT path=/internal/kv status=204 duration_ms=0 remote=127.0.0.1:64444
+2026/08/26 08:52:51 INFO request method=PUT path=/internal/kv status=204 duration_ms=0 remote=127.0.0.1:64446
+2026/08/26 08:52:51 INFO request method=PUT path=/internal/kv status=204 duration_ms=0 remote=127.0.0.1:64447
+2026/08/26 08:52:51 INFO request method=PUT path=/internal/kv status=204 duration_ms=0 remote=127.0.0.1:64449
+2026/08/26 08:52:51 INFO request method=PUT path=/internal/kv status=204 duration_ms=0 remote=127.0.0.1:64448
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64443
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64445
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64444
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64442
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64451
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64453
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64450
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64452
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64454
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64456
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64455
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64457
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64449
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64447
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64448
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64446
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64458
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64460
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64459
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64461
+--- PASS: TestLeaderlessWritesFromDifferentCoordinatorsConverge (0.00s)
+=== RUN   TestLeaderFollowerWriteReachesEveryReplica
+2026/08/26 08:52:51 INFO request method=PUT path=/internal/kv status=204 duration_ms=0 remote=127.0.0.1:64467
+2026/08/26 08:52:51 INFO request method=PUT path=/internal/kv status=204 duration_ms=0 remote=127.0.0.1:64468
+2026/08/26 08:52:51 INFO request method=PUT path=/internal/kv status=204 duration_ms=0 remote=127.0.0.1:64469
+2026/08/26 08:52:51 INFO request method=PUT path=/internal/kv status=204 duration_ms=0 remote=127.0.0.1:64470
+--- PASS: TestLeaderFollowerWriteReachesEveryReplica (0.00s)
+=== RUN   TestFollowerRejectsClientWrites
+--- PASS: TestFollowerRejectsClientWrites (0.00s)
+=== RUN   TestWriteFailsWhenQuorumIsUnreachable
+2026/08/26 08:52:51 WARN replication failed peer=http://127.0.0.1:2 key=k version=1 err="503: calling kv-peer:127.0.0.1:2: Put \"http://127.0.0.1:2/internal/kv\": dial tcp 127.0.0.1:2: connect: connection refused"
+2026/08/26 08:52:51 WARN replication failed peer=http://127.0.0.1:1 key=k version=1 err="503: calling kv-peer:127.0.0.1:1: Put \"http://127.0.0.1:1/internal/kv\": dial tcp 127.0.0.1:1: connect: connection refused"
+--- PASS: TestWriteFailsWhenQuorumIsUnreachable (0.00s)
+=== RUN   TestReadRepairHealsStaleReplicas
+2026/08/26 08:52:51 WARN replication failed peer=http://127.0.0.1:3 key=k version=1 err="503: calling kv-peer:127.0.0.1:3: Put \"http://127.0.0.1:3/internal/kv\": dial tcp 127.0.0.1:3: connect: connection refused"
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64481
+2026/08/26 08:52:51 INFO request method=GET path=/internal/kv status=200 duration_ms=0 remote=127.0.0.1:64480
+2026/08/26 08:52:51 INFO request method=PUT path=/internal/kv status=204 duration_ms=0 remote=127.0.0.1:64481
+--- PASS: TestReadRepairHealsStaleReplicas (0.03s)
+=== RUN   TestTransactionLifecycle
+--- PASS: TestTransactionLifecycle (0.00s)
+=== RUN   TestTransactionSweepReclaimsAbandoned
+2026/08/26 08:52:51 WARN reaped abandoned transactions count=2 ttl=1ns
+--- PASS: TestTransactionSweepReclaimsAbandoned (0.00s)
+=== RUN   TestCoordinatorWriteIncrementsVersion
+--- PASS: TestCoordinatorWriteIncrementsVersion (0.00s)
+=== RUN   TestApplyRejectsStaleWrites
+--- PASS: TestApplyRejectsStaleWrites (0.00s)
+=== RUN   TestApplyBreaksVersionTiesDeterministically
+--- PASS: TestApplyBreaksVersionTiesDeterministically (0.00s)
+=== RUN   TestApplyIsIdempotent
+--- PASS: TestApplyIsIdempotent (0.00s)
+=== RUN   TestConfigValidate
+--- PASS: TestConfigValidate (0.00s)
+=== RUN   TestStronglyConsistent
+--- PASS: TestStronglyConsistent (0.00s)
+=== RUN   TestEntriesExpireAfterTheirTTL
+--- PASS: TestEntriesExpireAfterTheirTTL (0.05s)
+=== RUN   TestExpiredEntriesAreInvisibleBeforeTheSweep
+--- PASS: TestExpiredEntriesAreInvisibleBeforeTheSweep (0.00s)
+=== RUN   TestSweepLeavesLiveEntriesAlone
+--- PASS: TestSweepLeavesLiveEntriesAlone (0.00s)
+=== RUN   TestVersionsKeepClimbingPastAnExpiredValue
+--- PASS: TestVersionsKeepClimbingPastAnExpiredValue (0.00s)
+=== RUN   TestExpiryReplicatesAsAnAbsoluteInstant
+--- PASS: TestExpiryReplicatesAsAnAbsoluteInstant (0.06s)
+PASS
+ok  	github.com/JDinSeattle/quorum-market/internal/kv	3.218s
+=== RUN   TestEachOrderEventProducesAMessage
+2026/08/26 08:52:52 INFO notification sent customerId=cust-1 orderId=ord-1 subject="Order ord-1 confirmed"
+2026/08/26 08:52:52 INFO notification sent customerId=cust-1 orderId=ord-1 subject="Order ord-1 is on its way"
+2026/08/26 08:52:52 INFO notification sent customerId=cust-1 orderId=ord-2 subject="Order ord-2 cancelled"
+--- PASS: TestEachOrderEventProducesAMessage (0.00s)
+=== RUN   TestUnrecognisedEventsAreIgnored
+--- PASS: TestUnrecognisedEventsAreIgnored (0.00s)
+=== RUN   TestTheInboxIsCapped
+2026/08/26 08:52:52 INFO notification sent customerId=cust-1 orderId=ord subject="Order ord confirmed"
+2026/08/26 08:52:52 INFO notification sent customerId=cust-1 orderId=ord subject="Order ord confirmed"
+2026/08/26 08:52:52 INFO notification sent customerId=cust-1 orderId=ord subject="Order ord confirmed"
+2026/08/26 08:52:52 INFO notification sent customerId=cust-1 orderId=ord subject="Order ord confirmed"
+2026/08/26 08:52:52 INFO notification sent customerId=cust-1 orderId=ord subject="Order ord confirmed"
+2026/08/26 08:52:52 INFO notification sent customerId=cust-1 orderId=ord subject="Order ord confirmed"
+2026/08/26 08:52:52 INFO notification sent customerId=cust-1 orderId=ord subject="Order ord confirmed"
+2026/08/26 08:52:52 INFO notification sent customerId=cust-1 orderId=ord subject="Order ord confirmed"
+2026/08/26 08:52:52 INFO notification sent customerId=cust-1 orderId=ord subject="Order ord confirmed"
+2026/08/26 08:52:52 INFO notification sent customerId=cust-1 orderId=ord subject="Order ord confirmed"
+2026/08/26 08:52:52 INFO notification sent customerId=cust-1 orderId=ord subject="Order ord confirmed"
+2026/08/26 08:52:52 INFO notification sent customerId=cust-1 orderId=ord subject="Order ord confirmed"
+2026/08/26 08:52:52 INFO notification sent customerId=cust-1 orderId=ord subject="Order ord confirmed"
+2026/08/26 08:52:52 INFO notification sent customerId=cust-1 orderId=ord subject="Order ord confirmed"
+2026/08/26 08:52:52 INFO notification sent customerId=cust-1 orderId=ord subject="Order ord confirmed"
+--- PASS: TestTheInboxIsCapped (0.00s)
+=== RUN   TestInboxesAreScopedToTheirCustomer
+2026/08/26 08:52:52 INFO notification sent customerId=cust-alice orderId=ord-1 subject="Order ord-1 confirmed"
+--- PASS: TestInboxesAreScopedToTheirCustomer (0.00s)
+=== RUN   TestEventsWithNoRecipientAreUndeliverable
+--- PASS: TestEventsWithNoRecipientAreUndeliverable (0.00s)
+=== RUN   TestSubscribesToEveryOrderEvent
+--- PASS: TestSubscribesToEveryOrderEvent (0.00s)
+PASS
+ok  	github.com/JDinSeattle/quorum-market/internal/notification	3.232s
+=== RUN   TestStatusClassCollapsesCodes
+--- PASS: TestStatusClassCollapsesCodes (0.00s)
+=== RUN   TestRequestIDsRoundTripThroughAContext
+--- PASS: TestRequestIDsRoundTripThroughAContext (0.00s)
+=== RUN   TestNewRequestIDsAreDistinct
+--- PASS: TestNewRequestIDsAreDistinct (0.00s)
+=== RUN   TestTheContextHandlerAttachesTheRequestID
+--- PASS: TestTheContextHandlerAttachesTheRequestID (0.00s)
+=== RUN   TestTheContextHandlerSurvivesDerivation
+--- PASS: TestTheContextHandlerSurvivesDerivation (0.00s)
+=== RUN   TestBuildReportsSomethingUseful
+--- PASS: TestBuildReportsSomethingUseful (0.00s)
+=== RUN   TestHealthWithNoChecksIsUp
+--- PASS: TestHealthWithNoChecksIsUp (0.00s)
+=== RUN   TestAFailingOptionalCheckDegradesRatherThanDowns
+--- PASS: TestAFailingOptionalCheckDegradesRatherThanDowns (0.00s)
+=== RUN   TestARequiredCheckTakesTheInstanceDown
+--- PASS: TestARequiredCheckTakesTheInstanceDown (0.00s)
+=== RUN   TestDrainingReportsDown
+--- PASS: TestDrainingReportsDown (0.00s)
+=== RUN   TestReportsAreCachedBriefly
+--- PASS: TestReportsAreCachedBriefly (0.00s)
+=== RUN   TestSlowProbesTimeOut
+--- PASS: TestSlowProbesTimeOut (2.00s)
+=== RUN   TestTheAdminSurface
+--- PASS: TestTheAdminSurface (0.00s)
+=== RUN   TestReadyzAnswers503WhenDown
+--- PASS: TestReadyzAnswers503WhenDown (0.00s)
+=== RUN   TestReadyzAnswers200WhenDegraded
+--- PASS: TestReadyzAnswers200WhenDegraded (0.00s)
+PASS
+ok  	github.com/JDinSeattle/quorum-market/internal/obs	5.501s
+=== RUN   TestAPlacedEventBecomesAnOrder
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64492
+2026/08/26 08:52:52 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64492
+2026/08/26 08:52:52 INFO order recorded orderId=ord-1 customerId=cust-1 total=42.5 status=placed
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64492
+--- PASS: TestAPlacedEventBecomesAnOrder (0.00s)
+=== RUN   TestRedeliveredPlacedEventsAreIgnored
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64494
+2026/08/26 08:52:52 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64494
+2026/08/26 08:52:52 INFO order recorded orderId=ord-1 customerId=cust-1 total=42.5 status=placed
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64494
+2026/08/26 08:52:52 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64494
+2026/08/26 08:52:52 INFO order marked shipped orderId=ord-1
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64494
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64494
+2026/08/26 08:52:52 INFO request method=GET path=/kv/scan status=200 duration_ms=0 remote=127.0.0.1:64494
+--- PASS: TestRedeliveredPlacedEventsAreIgnored (0.00s)
+=== RUN   TestAShippedEventAdvancesTheOrder
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64496
+2026/08/26 08:52:52 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64496
+2026/08/26 08:52:52 INFO order recorded orderId=ord-1 customerId=cust-1 total=10 status=placed
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64496
+2026/08/26 08:52:52 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64496
+2026/08/26 08:52:52 INFO order marked shipped orderId=ord-1
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64496
+--- PASS: TestAShippedEventAdvancesTheOrder (0.00s)
+=== RUN   TestOrdersAreListedNewestFirst
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64498
+2026/08/26 08:52:52 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64498
+2026/08/26 08:52:52 INFO order recorded orderId=ord-1000 customerId=cust-1 total=10 status=placed
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64498
+2026/08/26 08:52:52 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64498
+2026/08/26 08:52:52 INFO order recorded orderId=ord-2000 customerId=cust-1 total=10 status=placed
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64498
+2026/08/26 08:52:52 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64498
+2026/08/26 08:52:52 INFO order recorded orderId=ord-3000 customerId=cust-1 total=10 status=placed
+2026/08/26 08:52:52 INFO request method=GET path=/kv/scan status=200 duration_ms=0 remote=127.0.0.1:64498
+--- PASS: TestOrdersAreListedNewestFirst (0.00s)
+=== RUN   TestOrdersAreScopedToTheirCustomer
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64500
+2026/08/26 08:52:52 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64500
+2026/08/26 08:52:52 INFO order recorded orderId=ord-1 customerId=cust-alice total=10 status=placed
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64500
+2026/08/26 08:52:52 INFO request method=GET path=/kv/scan status=200 duration_ms=0 remote=127.0.0.1:64500
+--- PASS: TestOrdersAreScopedToTheirCustomer (0.00s)
+=== RUN   TestCancellingAPlacedOrder
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64502
+2026/08/26 08:52:52 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64502
+2026/08/26 08:52:52 INFO order recorded orderId=ord-1 customerId=cust-1 total=10 status=placed
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64502
+2026/08/26 08:52:52 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64502
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64502
+--- PASS: TestCancellingAPlacedOrder (0.00s)
+=== RUN   TestShippedOrdersCannotBeCancelled
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64504
+2026/08/26 08:52:52 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64504
+2026/08/26 08:52:52 INFO order recorded orderId=ord-1 customerId=cust-1 total=10 status=placed
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64504
+2026/08/26 08:52:52 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64504
+2026/08/26 08:52:52 INFO order marked shipped orderId=ord-1
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64504
+--- PASS: TestShippedOrdersCannotBeCancelled (0.00s)
+=== RUN   TestMalformedEventsAreRejected
+--- PASS: TestMalformedEventsAreRejected (0.00s)
+=== RUN   TestKeysAreNamespacedPerCustomer
+--- PASS: TestKeysAreNamespacedPerCustomer (0.00s)
+=== RUN   TestEventsCanArriveInEitherOrder
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64507
+2026/08/26 08:52:52 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64507
+2026/08/26 08:52:52 INFO order recorded orderId=ord-1 customerId=cust-1 total=42.5 status=placed
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64507
+2026/08/26 08:52:52 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64507
+2026/08/26 08:52:52 INFO order marked shipped orderId=ord-1
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64507
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64509
+2026/08/26 08:52:52 INFO recording a shipment before its order.placed arrived orderId=ord-1
+2026/08/26 08:52:52 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64509
+2026/08/26 08:52:52 INFO order marked shipped orderId=ord-1
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64509
+2026/08/26 08:52:52 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64509
+2026/08/26 08:52:52 INFO order recorded orderId=ord-1 customerId=cust-1 total=42.5 status=shipped
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64509
+--- PASS: TestEventsCanArriveInEitherOrder (0.00s)
+=== RUN   TestAShipmentWithoutItsPlacementIsMarkedIncomplete
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64511
+2026/08/26 08:52:52 INFO recording a shipment before its order.placed arrived orderId=ord-1
+2026/08/26 08:52:52 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64511
+2026/08/26 08:52:52 INFO order marked shipped orderId=ord-1
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64511
+--- PASS: TestAShipmentWithoutItsPlacementIsMarkedIncomplete (0.00s)
+=== RUN   TestALatePlacementDoesNotRewindTheStatus
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64513
+2026/08/26 08:52:52 INFO recording a shipment before its order.placed arrived orderId=ord-1
+2026/08/26 08:52:52 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64513
+2026/08/26 08:52:52 INFO order marked shipped orderId=ord-1
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64513
+2026/08/26 08:52:52 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64513
+2026/08/26 08:52:52 INFO order recorded orderId=ord-1 customerId=cust-1 total=42.5 status=shipped
+2026/08/26 08:52:52 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64513
+--- PASS: TestALatePlacementDoesNotRewindTheStatus (0.00s)
+PASS
+ok  	github.com/JDinSeattle/quorum-market/internal/order	3.774s
+?   	github.com/JDinSeattle/quorum-market/internal/orders	[no test files]
+=== RUN   TestPutThenGet
+2026/08/26 08:52:53 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64516
+2026/08/26 08:52:53 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64516
+--- PASS: TestPutThenGet (0.00s)
+=== RUN   TestUnknownProductsAreNotFound
+2026/08/26 08:52:53 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64521
+--- PASS: TestUnknownProductsAreNotFound (0.00s)
+=== RUN   TestGetAndPutValidateTheirInput
+--- PASS: TestGetAndPutValidateTheirInput (0.00s)
+=== RUN   TestAWriteIsVisibleImmediately
+2026/08/26 08:52:53 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64526
+2026/08/26 08:52:53 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64526
+2026/08/26 08:52:53 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64526
+2026/08/26 08:52:53 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64526
+--- PASS: TestAWriteIsVisibleImmediately (0.00s)
+=== RUN   TestRepeatedReadsDoNotReachTheDatabase
+2026/08/26 08:52:53 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64530
+2026/08/26 08:52:53 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64530
+--- PASS: TestRepeatedReadsDoNotReachTheDatabase (0.00s)
+=== RUN   TestTheServiceWorksWithoutACache
+2026/08/26 08:52:53 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64533
+2026/08/26 08:52:53 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64533
+--- PASS: TestTheServiceWorksWithoutACache (0.00s)
+=== RUN   TestAnUnreadableRecordIsAnInternalError
+2026/08/26 08:52:53 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64535
+2026/08/26 08:52:53 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64535
+--- PASS: TestAnUnreadableRecordIsAnInternalError (0.00s)
+=== RUN   TestKeysAreNamespaced
+--- PASS: TestKeysAreNamespaced (0.00s)
+=== RUN   TestTheHTTPSurface
+2026/08/26 08:52:53 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64538
+2026/08/26 08:52:53 INFO request method=PUT path=/product/p1 status=201 duration_ms=0 remote=192.0.2.1:1234
+2026/08/26 08:52:53 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64538
+2026/08/26 08:52:53 INFO request method=GET path=/product/p1 status=200 duration_ms=0 remote=192.0.2.1:1234
+2026/08/26 08:52:53 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64538
+2026/08/26 08:52:53 INFO request method=GET path=/product/ghost status=404 duration_ms=0 remote=192.0.2.1:1234
+--- PASS: TestTheHTTPSurface (0.00s)
+=== RUN   TestThePathWinsOverTheBody
+2026/08/26 08:52:53 INFO request method=PUT path=/kv status=201 duration_ms=0 remote=127.0.0.1:64542
+2026/08/26 08:52:53 INFO request method=PUT path=/product/p1 status=201 duration_ms=0 remote=192.0.2.1:1234
+2026/08/26 08:52:53 INFO request method=GET path=/kv status=404 duration_ms=0 remote=127.0.0.1:64542
+2026/08/26 08:52:53 INFO request method=GET path=/kv status=200 duration_ms=0 remote=127.0.0.1:64542
+--- PASS: TestThePathWinsOverTheBody (0.00s)
+PASS
+ok  	github.com/JDinSeattle/quorum-market/internal/product	3.900s
+=== RUN   TestRequestsAreAllowedUpToTheLimit
+--- PASS: TestRequestsAreAllowedUpToTheLimit (0.01s)
+=== RUN   TestBudgetsAreIndependentPerIdentity
+--- PASS: TestBudgetsAreIndependentPerIdentity (0.00s)
+=== RUN   TestTheWindowSlidesRatherThanResetting
+--- PASS: TestTheWindowSlidesRatherThanResetting (0.00s)
+=== RUN   TestTheWindowIsMeasuredByRedisNotTheCaller
+--- PASS: TestTheWindowIsMeasuredByRedisNotTheCaller (0.00s)
+=== RUN   TestConcurrentRequestsCannotExceedTheLimit
+--- PASS: TestConcurrentRequestsCannotExceedTheLimit (0.02s)
+=== RUN   TestUnreachableRedisFailsOpenByDefault
+redis: 2026/08/26 08:52:54 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64634: connect: connection refused
+redis: 2026/08/26 08:52:54 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64634: connect: connection refused
+redis: 2026/08/26 08:52:54 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64634: connect: connection refused
+redis: 2026/08/26 08:52:55 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64634: connect: connection refused
+2026/08/26 08:52:55 WARN rate limiter unavailable scope=test fail_open=true err="dial tcp 127.0.0.1:64634: connect: connection refused"
+redis: 2026/08/26 08:52:55 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64634: connect: connection refused
+redis: 2026/08/26 08:52:56 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64634: connect: connection refused
+redis: 2026/08/26 08:52:56 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64634: connect: connection refused
+redis: 2026/08/26 08:52:57 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64634: connect: connection refused
+2026/08/26 08:52:57 WARN rate limiter unavailable scope=test fail_open=true err="dial tcp 127.0.0.1:64634: connect: connection refused"
+redis: 2026/08/26 08:52:57 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64634: connect: connection refused
+redis: 2026/08/26 08:52:57 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64634: connect: connection refused
+redis: 2026/08/26 08:52:58 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64634: connect: connection refused
+redis: 2026/08/26 08:52:58 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64634: connect: connection refused
+2026/08/26 08:52:58 WARN rate limiter unavailable scope=test fail_open=true err="dial tcp 127.0.0.1:64634: connect: connection refused"
+redis: 2026/08/26 08:52:59 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64634: connect: connection refused
+redis: 2026/08/26 08:52:59 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64634: connect: connection refused
+redis: 2026/08/26 08:53:00 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64634: connect: connection refused
+redis: 2026/08/26 08:53:00 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64634: connect: connection refused
+2026/08/26 08:53:00 WARN rate limiter unavailable scope=test fail_open=true err="dial tcp 127.0.0.1:64634: connect: connection refused"
+redis: 2026/08/26 08:53:00 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64634: connect: connection refused
+redis: 2026/08/26 08:53:01 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64634: connect: connection refused
+redis: 2026/08/26 08:53:01 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64634: connect: connection refused
+redis: 2026/08/26 08:53:02 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64634: connect: connection refused
+2026/08/26 08:53:02 WARN rate limiter unavailable scope=test fail_open=true err="dial tcp 127.0.0.1:64634: connect: connection refused"
+--- PASS: TestUnreachableRedisFailsOpenByDefault (8.70s)
+=== RUN   TestFailClosedIsAvailableWhenAbuseIsTheConcern
+redis: 2026/08/26 08:53:02 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64740: connect: connection refused
+redis: 2026/08/26 08:53:03 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64740: connect: connection refused
+redis: 2026/08/26 08:53:03 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64740: connect: connection refused
+redis: 2026/08/26 08:53:04 pool.go:762: redis: connection pool: failed to dial after 5 attempts: dial tcp 127.0.0.1:64740: connect: connection refused
+2026/08/26 08:53:04 WARN rate limiter unavailable scope=test fail_open=false err="dial tcp 127.0.0.1:64740: connect: connection refused"
+--- PASS: TestFailClosedIsAvailableWhenAbuseIsTheConcern (1.71s)
+=== RUN   TestANilClientDisablesLimiting
+--- PASS: TestANilClientDisablesLimiting (0.00s)
+=== RUN   TestSimultaneousRequestsAreCountedSeparately
+--- PASS: TestSimultaneousRequestsAreCountedSeparately (0.01s)
+PASS
+ok  	github.com/JDinSeattle/quorum-market/internal/ratelimit	14.735s
+?   	github.com/JDinSeattle/quorum-market/internal/redisx	[no test files]
+=== RUN   TestURLEscapesCredentials
+--- PASS: TestURLEscapesCredentials (0.00s)
+=== RUN   TestURLEncodesANamedVHost
+--- PASS: TestURLEncodesANamedVHost (0.00s)
+=== RUN   TestRedactedHidesThePassword
+--- PASS: TestRedactedHidesThePassword (0.00s)
+=== RUN   TestDeadLetterNamesAreDerivedFromTheQueue
+--- PASS: TestDeadLetterNamesAreDerivedFromTheQueue (0.00s)
+=== RUN   TestConfigFromEnvPrefersTheExplicitNames
+--- PASS: TestConfigFromEnvPrefersTheExplicitNames (0.00s)
+=== RUN   TestConfigFromEnvFallsBackToTheShortNames
+--- PASS: TestConfigFromEnvFallsBackToTheShortNames (0.00s)
+=== RUN   TestConfigFromEnvHasWorkableDefaults
+--- PASS: TestConfigFromEnvHasWorkableDefaults (0.00s)
+PASS
+ok  	github.com/JDinSeattle/quorum-market/internal/rmq	4.576s
+=== RUN   TestQuantitySeedsUnknownProducts
+--- PASS: TestQuantitySeedsUnknownProducts (0.00s)
+=== RUN   TestReserveDeductsStock
+--- PASS: TestReserveDeductsStock (0.00s)
+=== RUN   TestReserveIsAllOrNothing
+--- PASS: TestReserveIsAllOrNothing (0.00s)
+=== RUN   TestReserveMergesDuplicateProducts
+--- PASS: TestReserveMergesDuplicateProducts (0.00s)
+=== RUN   TestReserveRejectsBadInput
+--- PASS: TestReserveRejectsBadInput (0.00s)
+=== RUN   TestReleaseAndExpiryDoNotBothRestore
+--- PASS: TestReleaseAndExpiryDoNotBothRestore (0.00s)
+=== RUN   TestReleaseIsIdempotent
+--- PASS: TestReleaseIsIdempotent (0.00s)
+=== RUN   TestShipDoesNotDeductTwice
+--- PASS: TestShipDoesNotDeductTwice (0.00s)
+=== RUN   TestShipAfterExpiryCompensates
+2026/08/26 08:52:54 INFO reclaimed expired reservations count=1
+2026/08/26 08:52:54 WARN shipping an order with no live reservation; deducting stock now reservationId=res-0bb431192f4ebb83289104de4c060c25
+--- PASS: TestShipAfterExpiryCompensates (0.00s)
+=== RUN   TestCompensationClampsAtZero
+2026/08/26 08:52:54 WARN shipping an order with no live reservation; deducting stock now reservationId=unknown-reservation
+--- PASS: TestCompensationClampsAtZero (0.00s)
+=== RUN   TestSweepReclaimsOnlyExpired
+2026/08/26 08:52:54 INFO reclaimed expired reservations count=1
+--- PASS: TestSweepReclaimsOnlyExpired (0.00s)
+=== RUN   TestConcurrentReservesNeverOversell
+--- PASS: TestConcurrentReservesNeverOversell (0.00s)
+=== RUN   TestConcurrentReserveReleaseConservesStock
+--- PASS: TestConcurrentReserveReleaseConservesStock (0.00s)
+PASS
+ok  	github.com/JDinSeattle/quorum-market/internal/warehouse	4.082s
