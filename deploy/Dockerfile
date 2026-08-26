@@ -57,5 +57,4 @@ LABEL org.opencontainers.image.title="quorum-market" \
       org.opencontainers.image.source="https://github.com/JDinSeattle/quorum-market" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.revision="${COMMIT}" \
-      org.opencontainers.image.created="${BUILD_DATE}" \
-      org.opencontainers.image.licenses="MIT"
+      org.opencontainers.image.created="${BUILD_DATE}"

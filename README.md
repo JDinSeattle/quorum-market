@@ -1,9 +1,22 @@
 # Quorum Market
 
+[![CI](https://github.com/JDinSeattle/quorum-market/actions/workflows/ci.yml/badge.svg)](https://github.com/JDinSeattle/quorum-market/actions/workflows/ci.yml)
+[![Go](https://img.shields.io/badge/go-1.25%2B-00ADD8?logo=go&logoColor=white)](go.mod)
+[![Evidence](https://img.shields.io/badge/evidence-19%2F19%20gates-brightgreen)](evidence/latest/SUMMARY.md)
+
 A distributed e-commerce backend in Go. Eight microservices behind an API
 gateway, three custom key-value clusters with different replication
 strategies, Redis doing four different jobs, RabbitMQ carrying both commands
 and events, and enough AWS to autoscale under load.
+
+| | |
+|---|---|
+| **Services** | 8, plus 13 database nodes, Redis and RabbitMQ — 23 containers |
+| **Storage** | Three quorum-replicated key-value clusters, two replication strategies |
+| **Messaging** | A work queue for commands, a topic exchange for events, dead-letter queues for both |
+| **Consistency** | `W + R > N` three times over, with three different answers |
+| **Tests** | 195, all under the race detector; two end-to-end suites against a live stack |
+| **Verification** | [19 gates recorded per run](evidence/latest/SUMMARY.md), full output committed |
 
 It exists to make distributed systems trade-offs concrete: what a write quorum
 costs, why carts and catalogues want opposite storage designs, where a
@@ -83,6 +96,7 @@ trust safe to trust.
 - [Observability](#observability)
 - [Simulated latency, and why it burns CPU](#simulated-latency-and-why-it-burns-cpu)
 - [API](#api)
+- [Measured behaviour](#measured-behaviour)
 - [Testing](#testing)
 - [Test evidence](#test-evidence)
 - [Load testing](#load-testing)
@@ -503,6 +517,60 @@ cart exists but belongs to someone else is itself information worth withholding.
 | `GET /kv/stats` | Node id, mode, quorums, key count, transaction counters |
 | `POST /db/{begin,end,abort}_transaction` | Simulated transaction lifecycle |
 
+## Measured behaviour
+
+The architecture, the load profile and the scaling metrics here are calibrated
+against real measurements — but not measurements of *this* code. They come from
+the predecessor implementation of the same design: the same use cases, the same
+frequency assumptions, the same simulated-work distribution, written in Java
+and deployed on AWS as a five-person course project before this rewrite.
+
+Autoscaled services ran on ECS Fargate; the database nodes and the fixed
+infrastructure ran on EC2. Locust drove the load through the ALB.
+
+| | 50 users | 100 users | 200 users | 400 users |
+|---|---|---|---|---|
+| Throughput | 32 req/s | 45 req/s | 76 req/s | **117 req/s** |
+| Median | 1.0 s | 1.3 s | 1.6 s | 1.8 s |
+| p95 | 3.2 s | 3.2 s | 4.7 s | 7.2 s |
+| p99 | — | 4.3 s | 6.1 s | — |
+| Autoscaled tasks | 2 | 2 → 4 | 4+ | 4+ |
+| Errors | 7% | 7% | 9% | 7% |
+
+39,747 requests over the full ramp. The ~7% error rate is the expected
+outcomes — declined cards and out-of-stock conflicts — not failures.
+
+Three findings shaped the rewrite.
+
+**Where it saturates, and in what order.** Tuning aimed for everything to reach
+its limit at about the same load rather than one component failing long before
+the others:
+
+| Component | Scaling | Saturates around |
+|---|---|---|
+| Product service | CPU > 60% | 150–200 users |
+| Cart service | Memory > 30% | 200–300 users |
+| Broker + warehouse + payments (fixed) | none | 300–400 users |
+| Database nodes (fixed) | none | 400+ users |
+
+**The bottleneck was the co-located fixed host.** Every checkout passes through
+the one instance holding RabbitMQ, the warehouse and the payment stub, and it
+cannot autoscale because it holds the broker's state. That is still true here,
+and it is why the warehouse's in-memory ledger is called out as the reason it
+is a single instance.
+
+**The scaling metric was the wrong one.** Memory-based scaling on the cart
+service needed its target dropped from 60% to 30% before it triggered at all —
+a JVM on a 512 MB container reclaimed the simulated allocations faster than
+they were made. That is a fact about the runtime, not about load. This rewrite
+scales the cart service on **requests per instance** instead: it spends most of
+a checkout waiting on three other services, so neither CPU nor memory reflects
+the pressure, but request count does.
+
+The AWS console screenshots from that deployment are deliberately not included
+here — they carry an account id and a university email in the page chrome, and
+neither belongs in a public repository.
+
 ## Testing
 
 ```bash
@@ -544,6 +612,19 @@ it — to a timestamped directory under [`evidence/`](evidence/), with
 
 Start with `SUMMARY.md`. It records the commit, the toolchain, a pass/fail table
 per gate, coverage by package, and every assertion the smoke tests made.
+
+The most recent run:
+
+| | |
+|---|---|
+| Gates | 19 passed, 0 failed, 0 skipped |
+| Tests | 195, all under the race detector |
+| Coverage | 51% overall, per-package breakdown in the summary |
+| Static analysis | `go vet`, `golangci-lint` (0 issues), `govulncheck` (0 vulnerabilities) |
+| Build | Every service cross-compiled for `linux/amd64` |
+| Infrastructure | `terraform fmt -check` and `terraform validate` |
+| End to end | Both smoke suites against a live 23-container stack |
+| Load | 60 s Locust run through the gateway, authenticated |
 
 Three things make it evidence rather than decoration:
 
