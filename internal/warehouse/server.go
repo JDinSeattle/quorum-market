@@ -56,7 +56,7 @@ func (s *Server) handleReserve(w http.ResponseWriter, r *http.Request) error {
 
 	s.delay.Simulate()
 
-	reservation, err := s.inv.Reserve(req.Items)
+	reservation, err := s.inv.ReserveWithRequestID(req.RequestID, req.Items)
 	if err != nil {
 		var stockErr *InsufficientStockError
 		if errors.As(err, &stockErr) {
@@ -73,8 +73,9 @@ func (s *Server) handleReserve(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	httpx.JSON(w, http.StatusOK, orders.ReserveResponse{
+		RequestID:     reservation.RequestID,
 		ReservationID: reservation.ID,
-		Status:        "reserved",
+		Status:        string(reservation.State),
 		ExpiresAt:     reservation.ExpiresAt,
 	})
 	return nil

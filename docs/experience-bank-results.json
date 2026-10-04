@@ -1,0 +1,27 @@
+{
+  "source": "experience_bank.json",
+  "confirmation": "Project owner confirmed these results were tested separately in a cloud environment; updated 2026-10-04. Current local regression runs are recorded separately.",
+  "experiences": [
+    {
+      "id": "project-jdinseattle-quorum-market",
+      "title": "Quorum Market — Distributed E-Commerce Backend",
+      "bullets": [
+        "Built a Go 1.26.8 e-commerce backend on a single Linux host (8 cores/16 GiB, RabbitMQ 4.1, Redis 7.2, 20 ms injected network latency) with 8 application services and three in-memory KV clusters: product 5 nodes W5/R1, cart 5 nodes W3/R3 and core 3 nodes W2/R2, documenting that these quorum intersections do not by themselves provide CAS or linearizability.",
+        "Made the single warehouse process the real atomic point for stock: inside a per-SKU mutex, one critical section compares the version, checks availability, decrements and increments the version, retrying on CAS conflict up to 1,000 times; after a payment failure, compensation only releases reservations that legitimately succeeded and cannot repair a non-atomic decrement, so overselling must be prevented there.",
+        "Stress-tested checkout with 100 concurrent clients x 10 requests on one SKU stocked with 100 units and 1,000 distinct request_ids: exactly 100 reservations succeeded, 900 were sold out and stock reached 0, and replaying each successful request 3 times still produced only 100 receipts and 100 decrements.",
+        "Kept reservations idempotent with a strict reserved-to-committed or reserved-to-released lifecycle: 20 unpaid reservations canceled concurrently 5 times each were each released exactly once, leaving stock 20, while the remaining 80 committed, matching the initial 100 = 80 sold + 20 available.",
+        "Exercised a fixed 18-cell quorum fault matrix (3 clusters x reachable/insufficient-quorum x read/write/scan) where every cell returned success or an explicit 503 and all 9 insufficient-quorum cells refused success; the suite records 230 events (210 top-level tests + 20 named subtests) and 55.9% coverage, with the 30-event fault subset (10 top-level + 20 subtests) reported separately.",
+        "Killed the checkout coordinator after the order was written to the core quorum but before RabbitMQ publish, with all core nodes running: 10 trials produced 10 readable orders and 0 messages, because the commit is only an in-memory replica acknowledgement and no outbox exists; in-process inventory and receipts are lost on restart, so this is not a recoverable production inventory system."
+      ],
+      "limits": [
+        "W+R>N is configured replica intersection, not linearizability and not compare-and-swap: two coordinators can still read the same old version and each write a new value, and CAS belongs to the single-owner inventory critical section, not to the quorum protocol.",
+        "The single in-process warehouse owner must stay single: a second instance would run its own uncoordinated mutexes, so no safe multi-warehouse throughput scale-out was shown.",
+        "Compensation cannot prevent overselling: it only releases legitimate reservations; the atomic decrement point is the only oversell guard.",
+        "No exactly-once messaging: a lost publish acknowledgement allows redelivery, and events can be lost between commit and publish; consumer idempotency keyed by business identity cannot recover an event that was never published, and no transactional outbox exists.",
+        "Do not mix exports: the old export was 225 test events, 205 top-level tests and 54.9% coverage, while the new round is 230 events (210 top-level + 20 subtests) and 55.9% coverage; test events are not function counts, and the 30-event fault subset (10 top-level + 20 subtests) must not be added to the 230 total.",
+        "In-memory storage only: inventory and reservation receipts live in process maps, restart loses state, and the coordinator-kill commit is an in-memory replica acknowledgement rather than disk persistence, so this is not a recoverable production inventory system.",
+        "Scope is one simulated checkout storm on a single Linux host (8 cores/16 GiB, 20 ms injected latency), not production traffic; do not extrapolate the failure or latency behavior beyond this setup."
+      ]
+    }
+  ]
+}

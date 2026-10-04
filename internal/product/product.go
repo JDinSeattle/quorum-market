@@ -1,7 +1,7 @@
 // Package product implements the product catalogue service.
 //
 // The catalogue is read-heavy and rarely written, which is why it sits on the
-// leader-follower cluster: writes pay for strong consistency, reads are served
+// leader-follower cluster: writes require every replica to acknowledge, reads are served
 // by a single node.
 package product
 

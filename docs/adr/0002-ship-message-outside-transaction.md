@@ -18,19 +18,19 @@ rather than a failed checkout.
 
 ## Consequences
 
-The worst case is an order that is charged, recorded, and not yet handed to
-fulfilment. That is visible in the logs, alertable
-(`ShipMessagesNotPublishing`), and recoverable by replaying from the stored
-order. The stock stays correctly accounted for in the meantime, because the
-reservation still holds it.
+A committed order can remain unqueued if the coordinator dies or publishing
+fails after the core order write. The failure is logged when the process survives;
+there is no transactional outbox or automatic replay. A reservation only holds
+stock until its TTL. After release or expiry, the warehouse rejects a delayed
+shipment instead of deducting stock again. Recovery requires reconciling the
+order, payment, and current stock; blindly replaying an expired hold is unsafe.
 
-The alternative's worst case is goods physically leaving the warehouse for an
-order that does not exist, which nothing can undo.
+The owner-confirmed cloud experiment in the README killed the coordinator in
+this gap in ten trials: ten orders were readable and no ship messages arrived.
+That is a separate cloud result, not a claim that this local regression run
+repeated the kill experiment. In-memory quorum acknowledgements also do not
+survive a full cluster restart.
 
-The customer is never told their checkout failed after their card was charged.
-That would be a lie, and it would send them to place the order again.
-
-The cost is that the system is not transactionally consistent across the queue
-boundary, and cannot be without an outbox table and a sweeper. That is the
-right next step if this were carrying real orders; it is deliberately out of
-scope here, and the gap is named rather than hidden.
+Publishing after commit keeps a failed order from being shipped by a premature
+message, but does not make order storage and RabbitMQ atomic. A durable outbox
+and delivery/reconciliation protocol remain outside this implementation.

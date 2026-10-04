@@ -57,11 +57,9 @@ type idempotencyRecord struct {
 // The key turns the retry into a replay: the second request returns the first
 // one's receipt rather than performing a second checkout.
 //
-// This is deduplication, not a distributed lock. Two genuinely simultaneous
-// requests carrying the same key can both observe an unclaimed key and
-// proceed; making that impossible needs a compare-and-set the store does not
-// offer. It closes the case that actually happens — a retry seconds after the
-// original — and the narrow race is documented rather than pretended away.
+// CheckoutService serializes each key within one process. This store has no
+// atomic compare-and-set, so two checkout processes can still claim the same key.
+// Quorum intersections do not extend that process-local mutex across replicas.
 type idempotencyStore struct {
 	db *kv.Client
 }

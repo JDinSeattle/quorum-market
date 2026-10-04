@@ -3,6 +3,7 @@ package cart
 import (
 	"context"
 	"net/http"
+	"sync"
 	"testing"
 
 	"github.com/JDinSeattle/quorum-market/internal/httpx"
@@ -199,5 +200,43 @@ func TestIdempotencyKeysAreValidated(t *testing.T) {
 	}
 	if got := h.authorizations.Load(); got != 0 {
 		t.Errorf("a rejected key still reached the authorizer %d times", got)
+	}
+}
+
+func TestConcurrentRequestIDReplaysOneCheckout(t *testing.T) {
+	h := newHarness(t, 100, 1.0)
+	h.seed(t, "p1", 1, 20)
+	h.add(t, "alice", "p1", 1)
+	start := make(chan struct{})
+	receipts := make(chan Receipt, 32)
+	var wg sync.WaitGroup
+	for range 32 {
+		wg.Go(func() {
+			<-start
+			receipt, e := h.checkout.Checkout(context.Background(), IDFor("alice"), CheckoutRequest{CreditCard: goodCard, RequestID: "simultaneous"})
+			if e != nil {
+				t.Error(e)
+				return
+			}
+			receipts <- receipt
+		})
+	}
+	close(start)
+	wg.Wait()
+	close(receipts)
+	if len(receipts) != 32 {
+		t.Fatalf("receipts=%d", len(receipts))
+	}
+	id := ""
+	for receipt := range receipts {
+		if id == "" {
+			id = receipt.OrderID
+		}
+		if id != receipt.OrderID {
+			t.Fatal("duplicate request created a new order")
+		}
+	}
+	if h.authorizations.Load() != 1 || h.inv.ReceiptCount() != 1 || h.inv.Quantity("p1") != 99 || len(h.publisher.shipMessages(t)) != 1 {
+		t.Fatalf("duplicate side effect: %d %v", h.authorizations.Load(), h.inv.Stats())
 	}
 }

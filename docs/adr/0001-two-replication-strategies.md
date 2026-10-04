@@ -25,8 +25,8 @@ replicates to all four followers before acknowledging. Reads are served from a
 single node with no coordination at all.
 
 **Carts — leaderless, W=3, R=3 over five nodes.** Any node coordinates any
-write. `W + R > N` keeps the quorums overlapping, so a read cannot miss a
-committed write. Conflicts are resolved last-write-wins on `(version, origin)`,
+write. `W + R > N` keeps the quorums overlapping; it does not establish CAS
+or linearizability. Conflicts are resolved last-write-wins on `(version, origin)`,
 with the origin as tie-break so every replica converges on the same winner.
 
 ## Consequences

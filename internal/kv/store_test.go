@@ -118,24 +118,24 @@ func TestConfigValidate(t *testing.T) {
 	}
 }
 
-func TestStronglyConsistent(t *testing.T) {
+func TestQuorumsIntersect(t *testing.T) {
 	// Cart cluster: W=3, R=3 over 5 nodes. 3+3 > 5, so reads see writes.
 	cart := Config{Mode: ModeLeaderless, Peers: []string{"a", "b", "c", "d"}, WriteQuorum: 3, ReadQuorum: 3}
-	if !cart.StronglyConsistent() {
-		t.Error("W=3/R=3 over 5 nodes should be strongly consistent")
+	if !cart.QuorumsIntersect() {
+		t.Error("W=3/R=3 over 5 nodes should have intersecting quorums")
 	}
 
 	// W=1/R=1 over 5 nodes: 1+1 < 5, so a read can miss a write.
 	loose := Config{Mode: ModeLeaderless, Peers: []string{"a", "b", "c", "d"}, WriteQuorum: 1, ReadQuorum: 1}
-	if loose.StronglyConsistent() {
-		t.Error("W=1/R=1 over 5 nodes should not be strongly consistent")
+	if loose.QuorumsIntersect() {
+		t.Error("W=1/R=1 over 5 nodes should not have intersecting quorums")
 	}
 
 	// Product cluster: every read is served by the leader, which holds every
 	// write it coordinated, so R=1 is still safe.
 	product := Config{Mode: ModeLeaderFollower, Role: "leader", Peers: []string{"a", "b", "c", "d"}, WriteQuorum: 5, ReadQuorum: 1}
-	if !product.StronglyConsistent() {
-		t.Error("leader-follower reads from the leader should be strongly consistent")
+	if !product.QuorumsIntersect() {
+		t.Error("leader-follower reads from the leader should have intersecting quorums")
 	}
 }
 

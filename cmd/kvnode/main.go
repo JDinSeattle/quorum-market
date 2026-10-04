@@ -57,7 +57,8 @@ func main() {
 		"cluster_size", cfg.ClusterSize(),
 		"write_quorum", cfg.WriteQuorum,
 		"read_quorum", cfg.ReadQuorum,
-		"strongly_consistent", cfg.StronglyConsistent(),
+		"quorums_intersect", cfg.QuorumsIntersect(),
+		"linearizable", false,
 		"build", obs.Build(),
 	)
 

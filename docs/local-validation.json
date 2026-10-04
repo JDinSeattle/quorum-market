@@ -1,0 +1,1194 @@
+{
+  "verified_at_utc": "2026-10-04T04:43:10.413427+00:00",
+  "scope": "Local regression on the current implementation; separate from the owner-confirmed cloud experience-bank results.",
+  "base_commit": "35153cb890f41545d156003c5db3603daffe63a2",
+  "go_version": "go1.26.8 linux/amd64",
+  "commands": [
+    {
+      "command": "go test -race -count=1 -coverprofile=/tmp/quorum-market-coverage.out -covermode=atomic -json ./...",
+      "exit_code": 0
+    },
+    {
+      "command": "go vet ./...",
+      "exit_code": 0
+    },
+    {
+      "command": "go build ./...",
+      "exit_code": 0
+    },
+    {
+      "command": "golangci-lint run --timeout=5m",
+      "version": "2.13.2",
+      "exit_code": 0,
+      "issues": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "results": {
+    "passing_test_events": 221,
+    "top_level_tests": 203,
+    "named_subtests": 18,
+    "failed_tests": 0,
+    "skipped_tests": 0,
+    "tested_packages": 30,
+    "statement_coverage_percent": 56.5,
+    "race_findings": 0
+  },
+  "contracts": {
+    "inventory_contention": {
+      "clients": 100,
+      "distinct_requests_per_client": 10,
+      "initial_stock": 100,
+      "successful_reservations": 100,
+      "sold_out_requests": 900,
+      "stock_after_reservations": 0,
+      "successful_receipt_replays": 300,
+      "successful_receipts_after_replay": 100,
+      "decrements_after_replay": 100
+    },
+    "terminal_states": {
+      "canceled_reservations": 20,
+      "concurrent_cancels_per_reservation": 5,
+      "successful_releases": 20,
+      "committed_reservations": 80,
+      "available_stock": 20,
+      "released_to_committed": "rejected",
+      "replayed_commit": "already-committed without stock movement",
+      "commit_to_release": "rejected"
+    },
+    "same_request_concurrency": {
+      "warehouse_contenders": 64,
+      "warehouse_receipts": 1,
+      "checkout_contenders": 32,
+      "checkout_authorizations": 1,
+      "checkout_receipts": 1,
+      "checkout_ship_messages": 1
+    },
+    "quorum_matrix": {
+      "cells": 18,
+      "reachable_successes": 9,
+      "insufficient_quorum_http_503": 9,
+      "transport": "real localhost HTTP replicas; disabled replica endpoints return injected 503",
+      "product_r1_caveat": "Read/scan insufficiency disables the serving coordinator; follower loss alone does not violate R=1."
+    },
+    "sequential_replication": "A successful first replica followed by a missing final acknowledgement returns 503."
+  },
+  "limits": [
+    "The 1000-request workload calls the inventory contract in process, not an eight-service cloud checkout deployment.",
+    "HTTP client/shipper integration and the quorum matrix use localhost servers.",
+    "RabbitMQ/Redis cloud deployment, injected 20 ms latency and ten coordinator-kill trials were not rerun locally.",
+    "Warehouse and checkout request locks require a single owner; stock, receipts and fingerprints are in memory and retained until restart.",
+    "No outbox, persistent inventory, distributed checkout CAS or linearizable KV protocol was added."
+  ],
+  "raw_test_output_sha256": "74a544baaa48730bf6c9d4a503f3304ff6d9831fdf2f50b406c649190142a8c7",
+  "passing_tests": [
+    {
+      "package": "internal/busywait",
+      "name": "TestDelayStaysWithinBounds",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/busywait",
+      "name": "TestDelayIsSkewedTowardTheFastEnd",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/busywait",
+      "name": "TestSimulateIsDisabledWhenMaxIsZero",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/auth",
+      "name": "TestIssuedTokensVerify",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/auth",
+      "name": "TestShortSecretsAreRefused",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/auth",
+      "name": "TestTokensSignedWithAnotherKeyAreRejected",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/auth",
+      "name": "TestExpiredTokensAreRejected",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/auth",
+      "name": "TestTokensWithoutAnExpiryAreRejected",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/auth",
+      "name": "TestTokensWithoutASubjectAreRejected",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/auth",
+      "name": "TestTokensFromAnotherIssuerAreRejected",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/auth",
+      "name": "TestAlgNoneIsRejected",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/auth",
+      "name": "TestMalformedTokensAreRejected",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/auth",
+      "name": "TestRevokedSessionsAreRejected",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/auth",
+      "name": "TestRevocationOutageFailsOpen",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/auth",
+      "name": "TestBearerTokenParsing",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/busywait",
+      "name": "TestBurnSpendsRoughlyTheRequestedTime",
+      "elapsed_seconds": 0.12
+    },
+    {
+      "package": "internal/cache",
+      "name": "TestSecondReadIsServedFromTheCache",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cache",
+      "name": "TestAbsencesAreRemembered",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cache",
+      "name": "TestConcurrentMissesCollapseIntoOneLoad",
+      "elapsed_seconds": 0.1
+    },
+    {
+      "package": "internal/warehouse",
+      "name": "TestQuantitySeedsUnknownProducts",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/warehouse",
+      "name": "TestReserveDeductsStock",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/warehouse",
+      "name": "TestReserveIsAllOrNothing",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/rmq",
+      "name": "TestURLEscapesCredentials",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/rmq",
+      "name": "TestURLEncodesANamedVHost",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/warehouse",
+      "name": "TestReserveMergesDuplicateProducts",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/rmq",
+      "name": "TestRedactedHidesThePassword",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/warehouse",
+      "name": "TestReserveRejectsBadInput",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/rmq",
+      "name": "TestDeadLetterNamesAreDerivedFromTheQueue",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/warehouse",
+      "name": "TestReleaseAndExpiryDoNotBothRestore",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/rmq",
+      "name": "TestConfigFromEnvPrefersTheExplicitNames",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/warehouse",
+      "name": "TestReleaseIsIdempotent",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/rmq",
+      "name": "TestConfigFromEnvFallsBackToTheShortNames",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/warehouse",
+      "name": "TestShipDoesNotDeductTwice",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/rmq",
+      "name": "TestConfigFromEnvHasWorkableDefaults",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/warehouse",
+      "name": "TestShipAfterExpiryIsRejected",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/warehouse",
+      "name": "TestUnknownShipmentCannotDeductStock",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/warehouse",
+      "name": "TestSweepReclaimsOnlyExpired",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/gateway",
+      "name": "TestSpoofedIdentityHeadersAreStripped",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/obs",
+      "name": "TestStatusClassCollapsesCodes",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/obs",
+      "name": "TestRequestIDsRoundTripThroughAContext",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/gateway",
+      "name": "TestSpoofedHeadersAreStrippedOnPublicRoutes",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/notification",
+      "name": "TestEachOrderEventProducesAMessage",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/obs",
+      "name": "TestNewRequestIDsAreDistinct",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/gateway",
+      "name": "TestPublicRoutesDoNotRequireAToken",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cca",
+      "name": "TestValidCardNumber",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestBreakerOpensAfterConsecutiveFailures",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestBreakerResetsOnSuccess",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/events",
+      "name": "TestEnvelopeRoundTrip",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/events",
+      "name": "TestDecodeRejectsAnEmptyPayload",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/events",
+      "name": "TestSubscribeRestoresTheCorrelationID",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/obs",
+      "name": "TestTheContextHandlerAttachesTheRequestID",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/obs",
+      "name": "TestTheContextHandlerSurvivesDerivation",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/events",
+      "name": "TestMalformedEventsAreDropped",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/obs",
+      "name": "TestBuildReportsSomethingUseful",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/obs",
+      "name": "TestHealthWithNoChecksIsUp",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/gateway",
+      "name": "TestProtectedRoutesRequireAValidToken",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/obs",
+      "name": "TestAFailingOptionalCheckDegradesRatherThanDowns",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/events",
+      "name": "TestARouterIgnoresUnknownEventTypes",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/events",
+      "name": "TestARouterDispatchesByType",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/obs",
+      "name": "TestARequiredCheckTakesTheInstanceDown",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/events",
+      "name": "TestRouterPatternsAreStableAndComplete",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/events",
+      "name": "TestHandlerErrorsPropagateForRedelivery",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/events",
+      "name": "TestANilPublisherIsHarmless",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/obs",
+      "name": "TestDrainingReportsDown",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/obs",
+      "name": "TestReportsAreCachedBriefly",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/notification",
+      "name": "TestUnrecognisedEventsAreIgnored",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/gateway",
+      "name": "TestVerifiedIdentityIsPassedDownstream",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/order",
+      "name": "TestAPlacedEventBecomesAnOrder",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/warehouse",
+      "name": "TestConcurrentReservesNeverOversell",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/product",
+      "name": "TestPutThenGet",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/ratelimit",
+      "name": "TestRequestsAreAllowedUpToTheLimit",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/product",
+      "name": "TestUnknownProductsAreNotFound",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/product",
+      "name": "TestGetAndPutValidateTheirInput",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/warehouse",
+      "name": "TestConcurrentReserveReleaseConservesStock",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/order",
+      "name": "TestRedeliveredPlacedEventsAreIgnored",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/gateway",
+      "name": "TestThrottledRequestsAreRefusedWithGuidance",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/ratelimit",
+      "name": "TestBudgetsAreIndependentPerIdentity",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/gateway",
+      "name": "TestAnUnreachableUpstreamIsReportedAsABadGateway",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/gateway",
+      "name": "TestUnroutedPathsAreNotFound",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/gateway",
+      "name": "TestAGatewayNeedsRoutes",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/notification",
+      "name": "TestTheInboxIsCapped",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestLeaderlessQuorumReadSeesQuorumWrite",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/product",
+      "name": "TestAWriteIsVisibleImmediately",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/notification",
+      "name": "TestInboxesAreScopedToTheirCustomer",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/order",
+      "name": "TestAShippedEventAdvancesTheOrder",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/notification",
+      "name": "TestEventsWithNoRecipientAreUndeliverable",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/notification",
+      "name": "TestSubscribesToEveryOrderEvent",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/ratelimit",
+      "name": "TestTheWindowSlidesRatherThanResetting",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/product",
+      "name": "TestRepeatedReadsDoNotReachTheDatabase",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/product",
+      "name": "TestTheServiceWorksWithoutACache",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestCheckoutHappyPath",
+      "elapsed_seconds": 0.02
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestBreakerRecoversThroughHalfOpen",
+      "elapsed_seconds": 0.02
+    },
+    {
+      "package": "internal/order",
+      "name": "TestOrdersAreListedNewestFirst",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/product",
+      "name": "TestAnUnreadableRecordIsAnInternalError",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/product",
+      "name": "TestKeysAreNamespaced",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/ratelimit",
+      "name": "TestTheWindowIsMeasuredByRedisNotTheCaller",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestLeaderlessWritesFromDifferentCoordinatorsConverge",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/identity",
+      "name": "TestRegisterThenLogin",
+      "elapsed_seconds": 0.03
+    },
+    {
+      "package": "internal/order",
+      "name": "TestOrdersAreScopedToTheirCustomer",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestLeaderFollowerWriteReachesEveryReplica",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestFollowerRejectsClientWrites",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/product",
+      "name": "TestTheHTTPSurface",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestWriteFailsWhenQuorumIsUnreachable",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/order",
+      "name": "TestCancellingAPlacedOrder",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/product",
+      "name": "TestThePathWinsOverTheBody",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestCheckoutDeclinedReleasesTheReservation",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/order",
+      "name": "TestShippedOrdersCannotBeCancelled",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/order",
+      "name": "TestMalformedEventsAreRejected",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/order",
+      "name": "TestKeysAreNamespacedPerCustomer",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/warehouse",
+      "name": "TestThousandRequestsAndThreeHundredReceiptReplays",
+      "elapsed_seconds": 0.03
+    },
+    {
+      "package": "internal/identity",
+      "name": "TestPasswordsAreNeverStoredInTheClear",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/warehouse",
+      "name": "TestSameRequestContendersShareOneImmutableReceipt",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestCheckoutOutOfStock",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/order",
+      "name": "TestEventsCanArriveInEitherOrder",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/warehouse",
+      "name": "TestHTTPReceiptAndShipperFailClosed",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestBreakerReopensWhenTheProbeFails",
+      "elapsed_seconds": 0.02
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestOnlyUnavailabilityCountsAgainstTheBreaker",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/order",
+      "name": "TestAShipmentWithoutItsPlacementIsMarkedIncomplete",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/order",
+      "name": "TestALatePlacementDoesNotRewindTheStatus",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestCheckoutInvalidCardReleasesTheReservation",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestClientRetriesIdempotentRequests",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/warehouse",
+      "name": "TestOppositeTerminalRacesAndOverflow",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestCheckoutRejectsEmptyAndMissingCarts",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestClientNeverRetriesPost",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestClientDoesNotRetryClientErrors",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/identity",
+      "name": "TestDuplicateRegistrationIsRefused",
+      "elapsed_seconds": 0.02
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestClientStopsAtMaxAttempts",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestReadRepairHealsStaleReplicas",
+      "elapsed_seconds": 0.03
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestTransactionLifecycle",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestCheckoutSucceedsEvenIfQueueingFails",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestTransactionSweepReclaimsAbandoned",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestClientPropagatesTheRequestID",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestClientShortCircuitsWhenTheBreakerOpens",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestAddItemUnknownProduct",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestFixedEighteenCellQuorumFaultMatrix/product/reachable/write",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestAddItemRejectsBadQuantities",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestFixedEighteenCellQuorumFaultMatrix/product/reachable/read",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestFixedEighteenCellQuorumFaultMatrix/product/reachable/scan",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestAddItemCountsWhatIsAlreadyInTheCart",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestFixedEighteenCellQuorumFaultMatrix/product/insufficient/write",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestFixedEighteenCellQuorumFaultMatrix/product/insufficient/read",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestFixedEighteenCellQuorumFaultMatrix/product/insufficient/scan",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestOneCustomerCannotActOnAnothersCart",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestFixedEighteenCellQuorumFaultMatrix/cart/reachable/write",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestFixedEighteenCellQuorumFaultMatrix/cart/reachable/read",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestAnAuthenticatedCallerCanUseTheirOwnCart",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestCartCreationIgnoresTheBodyWhenAuthenticated",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestFixedEighteenCellQuorumFaultMatrix/cart/reachable/scan",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestFixedEighteenCellQuorumFaultMatrix/cart/insufficient/write",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestFixedEighteenCellQuorumFaultMatrix/cart/insufficient/read",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestFixedEighteenCellQuorumFaultMatrix/cart/insufficient/scan",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestRetryWithTheSameKeyReplaysTheReceipt",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/ratelimit",
+      "name": "TestConcurrentRequestsCannotExceedTheLimit",
+      "elapsed_seconds": 0.06
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestFixedEighteenCellQuorumFaultMatrix/core/reachable/write",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestFixedEighteenCellQuorumFaultMatrix/core/reachable/read",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestFixedEighteenCellQuorumFaultMatrix/core/reachable/scan",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestFixedEighteenCellQuorumFaultMatrix/core/insufficient/write",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestFixedEighteenCellQuorumFaultMatrix/core/insufficient/read",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestFixedEighteenCellQuorumFaultMatrix/core/insufficient/scan",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestFixedEighteenCellQuorumFaultMatrix",
+      "elapsed_seconds": 0.04
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestWithoutAKeyEachRequestIsANewOrder",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestSequentialWriteRejectsOneMissingAcknowledgement",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestCoordinatorWriteIncrementsVersion",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestApplyRejectsStaleWrites",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestApplyBreaksVersionTiesDeterministically",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestApplyIsIdempotent",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestConfigValidate",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestQuorumsIntersect",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestClientRespectsContextCancellation",
+      "elapsed_seconds": 0.05
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestDifferentKeysProduceDifferentOrders",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestClientReportsMalformedResponses",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestClientIsSafeForConcurrentUse",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestRouterAnswersUnmatchedPaths",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestRouterMatchesPathParameters",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestRouteLabelStripsTheMethod",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestRequestIDHonoursAValidInboundID",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestRequestIDRejectsHostileInput",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestRecovererTurnsPanicsIntoErrors",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestLimiterShedsBeyondCapacity",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestLimiterAlwaysAdmitsProbes",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestLimiterOfZeroIsDisabled",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestWriteErrorHidesInternalDetail",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestWriteErrorKeepsClientMessages",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/httpx",
+      "name": "TestDecodeJSONRejectsUnknownFields",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestAKeyCannotBeReusedForAnotherCart",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestAnInFlightClaimBlocksADuplicate",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestAFailedCheckoutGivesTheKeyBack",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestIdempotencyKeysAreValidated",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestEntriesExpireAfterTheirTTL",
+      "elapsed_seconds": 0.05
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestExpiredEntriesAreInvisibleBeforeTheSweep",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestSweepLeavesLiveEntriesAlone",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestVersionsKeepClimbingPastAnExpiredValue",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestConcurrentRequestIDReplaysOneCheckout",
+      "elapsed_seconds": 0.02
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestAddOrMergeFoldsRepeatedProducts",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestAddOrMergeRefreshesTheSnapshot",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestTotalsRoundToCents",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestCartIDRoundTrip",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestCustomerForRejectsMalformedIDs",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cart",
+      "name": "TestOrderItemsDropPricing",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/kv",
+      "name": "TestExpiryReplicatesAsAnAbsoluteInstant",
+      "elapsed_seconds": 0.06
+    },
+    {
+      "package": "internal/cache",
+      "name": "TestAnUnreachableCacheFallsThroughToTheLoader",
+      "elapsed_seconds": 1.7
+    },
+    {
+      "package": "internal/cache",
+      "name": "TestInvalidationForcesAReload",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cache",
+      "name": "TestEntriesExpire",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cache",
+      "name": "TestANilClientDisablesCaching",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cache",
+      "name": "TestLoaderFailuresAreNotCached",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/cache",
+      "name": "TestAnAbandonedRequestIsNotACacheError",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/obs",
+      "name": "TestSlowProbesTimeOut",
+      "elapsed_seconds": 2
+    },
+    {
+      "package": "internal/obs",
+      "name": "TestTheAdminSurface",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/obs",
+      "name": "TestReadyzAnswers503WhenDown",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/obs",
+      "name": "TestReadyzAnswers200WhenDegraded",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/identity",
+      "name": "TestLoginFailuresAreIndistinguishable",
+      "elapsed_seconds": 1.99
+    },
+    {
+      "package": "internal/identity",
+      "name": "TestWeakCredentialsAreRefused",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/identity",
+      "name": "TestRefreshTokensRotate",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/identity",
+      "name": "TestUnknownRefreshTokensAreRefused",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/identity",
+      "name": "TestLogoutRevokesTheSessionImmediately",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/identity",
+      "name": "TestLogoutOnlyEndsItsOwnSession",
+      "elapsed_seconds": 0.02
+    },
+    {
+      "package": "internal/identity",
+      "name": "TestProfileLookup",
+      "elapsed_seconds": 0.01
+    },
+    {
+      "package": "internal/ratelimit",
+      "name": "TestUnreachableRedisFailsOpenByDefault",
+      "elapsed_seconds": 8.56
+    },
+    {
+      "package": "internal/ratelimit",
+      "name": "TestFailClosedIsAvailableWhenAbuseIsTheConcern",
+      "elapsed_seconds": 1.72
+    },
+    {
+      "package": "internal/ratelimit",
+      "name": "TestANilClientDisablesLimiting",
+      "elapsed_seconds": 0
+    },
+    {
+      "package": "internal/ratelimit",
+      "name": "TestSimultaneousRequestsAreCountedSeparately",
+      "elapsed_seconds": 0.01
+    }
+  ]
+}

@@ -78,24 +78,21 @@ func (s *Service) Read(ctx context.Context, key string) (Entry, bool, error) {
 	local, haveLocal := s.store.Get(key)
 
 	need := s.cfg.ReadQuorum - 1
-	if need <= 0 || len(s.cfg.Peers) == 0 {
+	if need <= 0 {
 		return local, haveLocal, nil
+	}
+	if len(s.cfg.Peers) < need {
+		return Entry{}, false, httpx.Errorf(http.StatusServiceUnavailable, "read quorum unavailable")
 	}
 	return s.readQuorum(ctx, key, local, haveLocal, need)
 }
 
 // Scan returns entries under a prefix, merged across a read quorum.
 //
-// Taking the union of what R replicas hold is what makes this correct rather
-// than best-effort. A key is only acknowledged once W replicas have it, and
-// W + R > N means any R replicas intersect every such set — so every committed
-// key appears in at least one of the responses. Where two replicas hold
-// different versions of the same key, the newer wins, exactly as in a
-// point read.
-//
-// This works because keys are added and never deleted. A store with deletes
-// would need tombstones for the union to be able to tell "not written yet"
-// from "written and removed".
+// It requires R successful replica replies, unions their entries and chooses
+// the highest version for conflicts. Quorum intersection is a counting property;
+// this in-memory store does not provide a linearizable snapshot or CAS. TTL
+// expiry, concurrent writes and bounded scans further limit what a scan observes.
 func (s *Service) Scan(ctx context.Context, prefix string, limit int) ([]Entry, error) {
 	if err := sleepCtx(ctx, s.cfg.ReadDelay); err != nil {
 		return nil, httpx.Wrap(http.StatusServiceUnavailable, err, "scan cancelled")
@@ -107,8 +104,10 @@ func (s *Service) Scan(ctx context.Context, prefix string, limit int) ([]Entry, 
 	}
 
 	need := s.cfg.ReadQuorum - 1
-	if need > 0 && len(s.cfg.Peers) > 0 {
-		s.mergePeerScans(ctx, prefix, limit, need, merged)
+	if need > 0 {
+		if err := s.mergePeerScans(ctx, prefix, limit, need, merged); err != nil {
+			return nil, err
+		}
 	}
 
 	out := make([]Entry, 0, len(merged))
@@ -123,10 +122,11 @@ func (s *Service) Scan(ctx context.Context, prefix string, limit int) ([]Entry, 
 	return out, nil
 }
 
-func (s *Service) mergePeerScans(ctx context.Context, prefix string, limit, need int, merged map[string]Entry) {
+func (s *Service) mergePeerScans(ctx context.Context, prefix string, limit, need int, merged map[string]Entry) error {
 	peers := s.cfg.Peers
 
-	rctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), s.cfg.RPCTimeout)
+	rctx, cancel := context.WithTimeout(ctx, s.cfg.RPCTimeout)
+	defer cancel()
 	var wg sync.WaitGroup
 
 	type scanResult struct {
@@ -157,9 +157,11 @@ func (s *Service) mergePeerScans(ctx context.Context, prefix string, limit, need
 			}
 		}
 		if answered++; answered >= need {
-			return
+			return nil
 		}
 	}
+	obs.ObserveQuorumFailure("scan")
+	return httpx.Errorf(http.StatusServiceUnavailable, "scan quorum of %d not met: only %d replicas answered", s.cfg.ReadQuorum, answered+1)
 }
 
 // ApplyReplication handles an entry pushed by another node.
@@ -235,7 +237,7 @@ func (s *Service) replicateParallel(ctx context.Context, cancel context.CancelFu
 		if err := <-acks; err != nil {
 			failed++
 			// Stop early once success has become arithmetically impossible.
-			if len(peers)-failed < need-acked {
+			if len(peers)-failed < need {
 				obs.ObserveQuorumFailure("write")
 				return httpx.Wrap(http.StatusServiceUnavailable, err,
 					"write quorum of %d not met for key %q", s.cfg.WriteQuorum, e.Key)
@@ -249,7 +251,8 @@ func (s *Service) replicateParallel(ctx context.Context, cancel context.CancelFu
 			return nil
 		}
 	}
-	return nil
+	obs.ObserveQuorumFailure("write")
+	return httpx.Errorf(http.StatusServiceUnavailable, "write quorum of %d not met: only %d replicas acknowledged", s.cfg.WriteQuorum, acked+1)
 }
 
 // replicateSequential pushes to one peer at a time. It is slower by design:
@@ -262,7 +265,7 @@ func (s *Service) replicateSequential(ctx context.Context, cancel context.Cancel
 	for i, peer := range peers {
 		if err := s.push(ctx, peer, e); err != nil {
 			failed++
-			if len(peers)-failed < need-acked {
+			if len(peers)-failed < need {
 				cancel()
 				obs.ObserveQuorumFailure("write")
 				return httpx.Wrap(http.StatusServiceUnavailable, err,
@@ -279,7 +282,8 @@ func (s *Service) replicateSequential(ctx context.Context, cancel context.Cancel
 		}
 	}
 	cancel()
-	return nil
+	obs.ObserveQuorumFailure("write")
+	return httpx.Errorf(http.StatusServiceUnavailable, "write quorum of %d not met: only %d replicas acknowledged", s.cfg.WriteQuorum, acked+1)
 }
 
 func (s *Service) pushAsync(ctx context.Context, wg *sync.WaitGroup, peers []string, e Entry) {
@@ -333,7 +337,7 @@ func (s *Service) readQuorum(ctx context.Context, key string, local Entry, haveL
 		r := <-results
 		if r.err != nil {
 			failed++
-			if len(peers)-failed < need-answered {
+			if len(peers)-failed < need {
 				obs.ObserveQuorumFailure("read")
 				return Entry{}, false, httpx.Wrap(http.StatusServiceUnavailable, r.err,
 					"read quorum of %d not met for key %q", s.cfg.ReadQuorum, key)
@@ -350,6 +354,10 @@ func (s *Service) readQuorum(ctx context.Context, key string, local Entry, haveL
 		}
 	}
 
+	if answered < need {
+		obs.ObserveQuorumFailure("read")
+		return Entry{}, false, httpx.Errorf(http.StatusServiceUnavailable, "read quorum of %d not met: only %d replicas answered", s.cfg.ReadQuorum, answered+1)
+	}
 	if bestFound {
 		// Deliberately not rctx: that context is cancelled as soon as the last
 		// fetch returns, which would kill every repair before it was sent.

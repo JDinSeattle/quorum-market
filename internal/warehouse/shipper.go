@@ -39,6 +39,12 @@ func (s *Shipper) Handle(ctx context.Context, body []byte) error {
 	}
 
 	outcome := s.inv.Ship(msg.ReservationID, msg.Items)
+	if outcome == ShipRejected {
+		return fmt.Errorf("%w: reservation %q is unknown, released, expired or does not match items", rmq.ErrDrop, msg.ReservationID)
+	}
+	if outcome == ShipDuplicate {
+		return nil
+	}
 
 	slog.InfoContext(ctx, "order shipped",
 		"orderId", msg.OrderID,
@@ -55,8 +61,8 @@ func (s *Shipper) Handle(ctx context.Context, body []byte) error {
 // announce publishes order.shipped.
 //
 // The inventory has already been updated, so a failure here must not cause a
-// redelivery: reapplying the ship message would deduct the stock a second
-// time. The event is lost, the ledger stays correct, and the log says so.
+// redelivery: duplicate ship commands are already idempotent, but replaying
+// them does not recreate an announcement. The event is lost and logged.
 func (s *Shipper) announce(ctx context.Context, msg orders.ShipMessage, outcome ShipOutcome) {
 	if s.events == nil || msg.CustomerID == "" {
 		return

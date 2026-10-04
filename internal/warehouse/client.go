@@ -49,8 +49,13 @@ func (c *Client) Quantity(ctx context.Context, productID string) (int, error) {
 // Reserve holds stock for every item or none. A shortfall surfaces as an
 // *httpx.APIError with status 409.
 func (c *Client) Reserve(ctx context.Context, items []orders.Item) (orders.ReserveResponse, error) {
+	return c.ReserveWithRequestID(ctx, newReservationID(), items)
+}
+
+// ReserveWithRequestID safely replays one intent while the warehouse process lives.
+func (c *Client) ReserveWithRequestID(ctx context.Context, requestID string, items []orders.Item) (orders.ReserveResponse, error) {
 	var resp orders.ReserveResponse
-	err := c.hc.PostJSON(ctx, c.base+"/warehouse/reserve", orders.ReserveRequest{Items: items}, &resp)
+	err := c.hc.PostJSON(ctx, c.base+"/warehouse/reserve", orders.ReserveRequest{RequestID: requestID, Items: items}, &resp)
 	if err != nil {
 		return orders.ReserveResponse{}, err
 	}

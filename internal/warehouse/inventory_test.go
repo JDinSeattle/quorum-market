@@ -158,7 +158,7 @@ func TestShipDoesNotDeductTwice(t *testing.T) {
 	}
 }
 
-func TestShipAfterExpiryCompensates(t *testing.T) {
+func TestShipAfterExpiryIsRejected(t *testing.T) {
 	inv := New(100, time.Nanosecond)
 
 	res, _ := inv.Reserve(items("p1", 10))
@@ -169,24 +169,24 @@ func TestShipAfterExpiryCompensates(t *testing.T) {
 		t.Fatalf("after expiry p1 = %d, want 100", got)
 	}
 
-	// The goods still shipped, so the units have to come off now.
-	if got := inv.Ship(res.ID, res.Items); got != ShipCompensated {
-		t.Fatalf("Ship outcome = %q, want %q", got, ShipCompensated)
+	// An expired reservation cannot authorize shipment or another decrement.
+	if got := inv.Ship(res.ID, res.Items); got != ShipRejected {
+		t.Fatalf("Ship outcome = %q, want %q", got, ShipRejected)
 	}
-	if got := inv.Quantity("p1"); got != 90 {
-		t.Errorf("p1 = %d, want 90", got)
+	if got := inv.Quantity("p1"); got != 100 {
+		t.Errorf("p1 = %d, want 100", got)
 	}
 }
 
-func TestCompensationClampsAtZero(t *testing.T) {
+func TestUnknownShipmentCannotDeductStock(t *testing.T) {
 	inv := New(5, DefaultTTL)
 
 	inv.Ship("unknown-reservation", items("p1", 12))
-	if got := inv.Quantity("p1"); got != 0 {
-		t.Errorf("p1 = %d, want 0: stock went negative", got)
+	if got := inv.Quantity("p1"); got != 5 {
+		t.Errorf("p1 = %d, want unchanged stock 5", got)
 	}
-	if got := inv.Stats()["oversold"].(uint64); got != 1 {
-		t.Errorf("oversold = %d, want 1", got)
+	if got := inv.Stats()["oversold"].(uint64); got != 0 {
+		t.Errorf("oversold = %d, want 0", got)
 	}
 }
 

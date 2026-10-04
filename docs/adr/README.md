@@ -19,3 +19,4 @@ no cost listed is usually a decision that was not really made.
 | [0009](0009-events-and-commands.md) | Events on a topic exchange, commands on a work queue |
 | [0010](0010-event-handlers-are-commutative.md) | Event handlers are commutative |
 | [0011](0011-redis-for-four-jobs.md) | Redis for four jobs, and what happens when it is gone |
+| [0012](0012-single-owner-inventory-receipts.md) | Single-owner inventory receipts and versioned mutation |

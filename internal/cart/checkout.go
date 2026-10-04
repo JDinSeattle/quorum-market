@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/JDinSeattle/quorum-market/internal/busywait"
@@ -32,6 +33,7 @@ type Publisher interface {
 
 // CheckoutRequest is the body of POST /shopping-cart/{cartId}/checkout.
 type CheckoutRequest struct {
+	RequestID  string `json:"request_id,omitempty"`
 	CartID     string `json:"cartId,omitempty"`
 	CreditCard string `json:"creditCard"`
 
@@ -77,9 +79,8 @@ type Receipt struct {
 // The ship message is published after the commit, not inside it. Publishing
 // first would risk shipping an order that then fails to commit, and there is
 // no way to un-ship. Publishing after means the worst case is an order that is
-// paid for and recorded but not yet queued — recoverable, and visible in the
-// logs — rather than goods that left the warehouse for an order that does not
-// exist.
+// paid for and recorded but not queued. There is no outbox or automatic replay;
+// the reservation can expire before an operator reconciles the missing message.
 type CheckoutService struct {
 	carts     *Service
 	warehouse *warehouse.Client
@@ -91,6 +92,8 @@ type CheckoutService struct {
 	idem      *idempotencyStore
 
 	cleanupTimeout time.Duration
+	requestLocksMu sync.Mutex
+	requestLocks   map[string]*sync.Mutex
 }
 
 // NewCheckoutService wires the checkout flow to its dependencies.
@@ -108,6 +111,7 @@ func NewCheckoutService(carts *Service, wh *warehouse.Client, cards *cca.Client,
 		delay:          delay,
 		idem:           newIdempotencyStore(db),
 		cleanupTimeout: 5 * time.Second,
+		requestLocks:   make(map[string]*sync.Mutex),
 	}
 }
 
@@ -117,6 +121,25 @@ func NewCheckoutService(carts *Service, wh *warehouse.Client, cards *cca.Client,
 // When the request carries an idempotency key, a repeat of a completed
 // checkout replays the original receipt instead of charging the card again.
 func (s *CheckoutService) Checkout(ctx context.Context, cartID string, req CheckoutRequest) (Receipt, error) {
+	if req.IdempotencyKey == "" {
+		req.IdempotencyKey = req.RequestID
+	}
+	if req.IdempotencyKey != "" {
+		if err := validateIdempotencyKey(req.IdempotencyKey); err != nil {
+			return Receipt{}, err
+		}
+		// This owner serializes identical requests. Quorum intersections do not
+		// extend this mutex to another checkout process.
+		s.requestLocksMu.Lock()
+		lock := s.requestLocks[req.IdempotencyKey]
+		if lock == nil {
+			lock = &sync.Mutex{}
+			s.requestLocks[req.IdempotencyKey] = lock
+		}
+		s.requestLocksMu.Unlock()
+		lock.Lock()
+		defer lock.Unlock()
+	}
 	if req.CreditCard == "" {
 		return Receipt{}, httpx.Errorf(http.StatusBadRequest, "creditCard is required")
 	}
@@ -126,9 +149,9 @@ func (s *CheckoutService) Checkout(ctx context.Context, cartID string, req Check
 		return Receipt{}, err
 	}
 
-	// Claimed before anything is reserved or charged, so a retry that arrives
-	// while the first attempt is still running is turned away rather than
-	// running a second checkout alongside it.
+	// Claimed before reserving or charging. A concurrent request handled by
+	// this owner waits on the request mutex above; a persisted incomplete
+	// claim from another owner or an earlier process still returns 409.
 	claimed := false
 	if req.IdempotencyKey != "" {
 		if err := validateIdempotencyKey(req.IdempotencyKey); err != nil {
@@ -208,7 +231,7 @@ func (s *CheckoutService) Checkout(ctx context.Context, cartID string, req Check
 	}()
 
 	// ── step 1: hold the stock ───────────────────────────────────────────
-	reservation, err := s.warehouse.Reserve(ctx, cart.OrderItems())
+	reservation, err := s.warehouse.ReserveWithRequestID(ctx, order.OrderID, cart.OrderItems())
 	if err != nil {
 		var apiErr *httpx.APIError
 		if errors.As(err, &apiErr) && apiErr.Status == http.StatusConflict {

@@ -115,13 +115,8 @@ func (c Config) Validate() error {
 	return nil
 }
 
-// StronglyConsistent reports whether the configured quorums guarantee that a
-// read observes the most recent acknowledged write (W + R > N).
-func (c Config) StronglyConsistent() bool {
-	if c.Mode == ModeLeaderFollower {
-		// All client reads are served by the leader, which applies every write
-		// it coordinates, so the guarantee holds regardless of R.
-		return true
-	}
+// QuorumsIntersect reports configured replica-set overlap only. It does not
+// establish linearizability, conditional writes or a distributed CAS protocol.
+func (c Config) QuorumsIntersect() bool {
 	return c.WriteQuorum+c.ReadQuorum > c.ClusterSize()
 }

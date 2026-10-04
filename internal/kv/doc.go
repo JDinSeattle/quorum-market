@@ -15,8 +15,8 @@
 // Both share the same quorum machinery. A write is acknowledged once W
 // replicas hold it, counting the coordinator; a read consults R replicas and
 // returns the highest version among them. Choosing W + R > N makes the two
-// quorums overlap, which is what guarantees a read sees the latest
-// acknowledged write.
+// quorums overlap. The version/origin conflict rule does not provide CAS,
+// linearizability, an atomic snapshot or durable storage.
 //
 // Concurrent writes are resolved by last-write-wins on (version, origin node).
 // The origin is the tie-break: two coordinators can independently allocate the

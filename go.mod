@@ -1,6 +1,6 @@
 module github.com/JDinSeattle/quorum-market
 
-go 1.25.0
+go 1.26.8
 
 require (
 	github.com/alicebob/miniredis/v2 v2.38.0

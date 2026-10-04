@@ -91,8 +91,7 @@ func (r *Replicator) Fetch(ctx context.Context, peer, key string) (Entry, bool, 
 	return Entry{}, false, err
 }
 
-// Scan reads a peer's local view of a prefix. Used to build the union that
-// makes a quorum scan complete.
+// Scan reads a peer's local view of a prefix for a quorum merge.
 func (r *Replicator) Scan(ctx context.Context, peer, prefix string, limit int) ([]Entry, error) {
 	var entries []Entry
 	url := fmt.Sprintf("%s/internal/kv/scan?prefix=%s&limit=%d",

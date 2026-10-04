@@ -662,7 +662,7 @@
     {
       "type": "timeseries",
       "title": "Shipments",
-      "description": "'compensated' means the ship message outlived its reservation \u2014 usually a queue backlog.",
+      "description": "Completed shipments commit existing holds once. Unknown, released, or expired holds are rejected and never deduct stock again.",
       "gridPos": {
         "h": 8,
         "w": 12,

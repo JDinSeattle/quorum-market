@@ -7,15 +7,15 @@
 A distributed e-commerce backend in Go. Eight microservices behind an API
 gateway, three custom key-value clusters with different replication
 strategies, Redis doing four different jobs, RabbitMQ carrying both commands
-and events, and enough AWS to autoscale under load.
+and events, and AWS deployment configuration. The cloud qualification below uses one Linux host.
 
 | | |
 |---|---|
 | **Services** | 8, plus 13 database nodes, Redis and RabbitMQ — 23 containers |
 | **Storage** | Three quorum-replicated key-value clusters, two replication strategies |
 | **Messaging** | A work queue for commands, a topic exchange for events, dead-letter queues for both |
-| **Consistency** | `W + R > N` three times over, with three different answers |
-| **Tests** | 195, all under the race detector; two end-to-end suites against a live stack |
+| **Consistency** | Replica quorum intersection; single-owner inventory atomicity is separate |
+| **Cloud regression record** | 230 events (210 top-level tests + 20 named subtests); the fault subset is reported separately |
 | **Verification** | [19 gates recorded per run](evidence/latest/SUMMARY.md), full output committed |
 
 It exists to make distributed systems trade-offs concrete: what a write quorum
@@ -80,6 +80,22 @@ bookkeeping is subtly wrong.
 Only the gateway is publicly reachable. Everything else answers on a
 VPC-restricted listener, which is what makes the identity headers the services
 trust safe to trust.
+
+## Cloud qualification results
+
+These results follow the project owner’s separately run cloud qualification recorded in the experience bank. The workload, environment, denominators and limitations below belong to that round; local regression checks for this checkout are separate. [Result record](docs/experience-bank-results.json).
+
+- Built a Go 1.26.8 e-commerce backend on a single Linux host (8 cores/16 GiB, RabbitMQ 4.1, Redis 7.2, 20 ms injected network latency) with 8 application services and three in-memory KV clusters: product 5 nodes W5/R1, cart 5 nodes W3/R3 and core 3 nodes W2/R2, documenting that these quorum intersections do not by themselves provide CAS or linearizability.
+
+- Made the single warehouse process the real atomic point for stock: inside a per-SKU mutex, one critical section compares the version, checks availability, decrements and increments the version, retrying on CAS conflict up to 1,000 times; after a payment failure, compensation only releases reservations that legitimately succeeded and cannot repair a non-atomic decrement, so overselling must be prevented there.
+
+- Stress-tested checkout with 100 concurrent clients x 10 requests on one SKU stocked with 100 units and 1,000 distinct request_ids: exactly 100 reservations succeeded, 900 were sold out and stock reached 0, and replaying each successful request 3 times still produced only 100 receipts and 100 decrements.
+
+- Kept reservations idempotent with a strict reserved-to-committed or reserved-to-released lifecycle: 20 unpaid reservations canceled concurrently 5 times each were each released exactly once, leaving stock 20, while the remaining 80 committed, matching the initial 100 = 80 sold + 20 available.
+
+- Exercised a fixed 18-cell quorum fault matrix (3 clusters x reachable/insufficient-quorum x read/write/scan) where every cell returned success or an explicit 503 and all 9 insufficient-quorum cells refused success; the suite records 230 events (210 top-level tests + 20 named subtests) and 55.9% coverage, with the 30-event fault subset (10 top-level + 20 subtests) reported separately.
+
+- Killed the checkout coordinator after the order was written to the core quorum but before RabbitMQ publish, with all core nodes running: 10 trials produced 10 readable orders and 0 messages, because the commit is only an in-memory replica acknowledgement and no outbox exists; in-process inventory and receipts are lost on restart, so this is not a recoverable production inventory system.
 
 ## Contents
 
@@ -189,10 +205,10 @@ map lookup with no coordination at all.
 **Carts** are the opposite: every shopper writes their own key, constantly. One
 leader would build a queue in front of a node with no reason to be a
 bottleneck. W=3 and R=3 over 5 nodes keeps `W + R > N`, so the quorums overlap
-and a cart read cannot miss a committed cart write, while tolerating two nodes
-down.
+and tolerates two unavailable replicas. Intersection alone does not supply CAS
+or linearizability; concurrent writers still resolve by version and origin.
 
-**Accounts and orders** are written rarely and must survive. Three nodes with
+**Accounts and orders** use three in-memory replicas. Three nodes with
 W=2/R=2 still satisfies `W + R > N` at a lower cost per write, and tolerates
 one node down. Identity and orders share this cluster — a deliberate
 compromise, with separate key namespaces so splitting them later is
@@ -205,8 +221,9 @@ would let replicas disagree about the winner and never converge.
 
 Reads that observe a stale replica repair it in the background. Entries can
 carry a TTL, which is what keeps idempotency records from accumulating forever.
-A prefix scan merges the union of a read quorum's views — correct, because a
-key acknowledged by W replicas must appear in any R of them when `W + R > N`.
+Read, write and prefix scan return 503 when their quorum is unavailable. A scan
+merges a read quorum's views; it is not a linearizable snapshot, and concurrent
+writes, TTL expiry and scan limits affect what it observes.
 
 → [ADR 1: two replication strategies](docs/adr/0001-two-replication-strategies.md)
 
@@ -320,10 +337,10 @@ end_transaction
 **Both messages go out after the commit.** Publishing first would risk
 shipping goods for an order that then fails to commit, and there is no way to
 un-ship. Publishing after means the worst case is an order that is paid for and
-recorded but not yet queued — visible in the logs, alertable, recoverable, with
-the stock still held by its reservation. A broker failure therefore does not
-fail the checkout: the customer has already been charged, and telling them it
-failed would be a lie.
+recorded but not queued. There is no outbox or automatic replay. The reservation
+can expire, after which a delayed ship command is rejected. Recovery requires
+reconciling the order, payment and available stock. A logged broker failure does
+not reverse a checkout whose order has already committed.
 
 **Unwinding happens in one place.** A single deferred cleanup releases the
 reservation, aborts the transaction and gives back the idempotency key unless
@@ -335,29 +352,30 @@ mid-checkout, the stock they were holding still has to go back.
 
 ## Inventory bookkeeping
 
-Stock lives in a map of atomic counters, one per product, so checkouts touching
-different products never contend. Reserving uses a compare-and-swap loop, which
-makes check-then-decrement atomic without locking the map — and makes
-overselling impossible even when a hundred shoppers race for the last unit.
+Stock lives in one warehouse process. Each SKU has a quantity, version and
+mutex. Reserving compares the observed version, checks availability, decrements
+stock and increments the version in one critical section, retrying a conflicting
+version at most 1,000 times. Multi-SKU requests acquire locks in SKU order and
+validate the whole cart before changing stock.
 
-The part that is easy to get wrong is the reservation lifecycle. A reservation
-deducts stock immediately and then resolves **exactly once**:
+A required `request_id` identifies the normalized reservation intent. Identical
+retries share the original receipt; changed items with the same ID return 409.
+Reservations retain a strict lifecycle:
 
 ```
-reserve ──► deducted, reservation held (30s TTL)
-              │
-              ├─ release  ──► stock restored
-              ├─ ship     ──► reservation retired, stock stays deducted
-              └─ expire   ──► stock restored
+reserved (stock deducted, 30s TTL)
+    ├─ ship             ──► committed (stock stays deducted)
+    └─ release / expiry ──► released  (stock restored once)
 ```
 
-Every path retires the reservation through the same removal under a lock, so
-being in the map *is* being pending. That is what stops a released reservation
-from also being expired later and handing the same units back twice — a bug
-that inflates stock on every declined payment and, over a load test, without
-bound.
+Terminal records remain in memory. Repeated commits and cancellations do not
+move stock; unknown, expired, released or item-mismatched shipment messages
+are rejected. A replay cannot reopen a released reservation. Stock and all
+receipts are lost on restart, and a second warehouse instance would have
+independent, uncoordinated locks.
 
 → [ADR 3: a reservation resolves exactly once](docs/adr/0003-reservations-resolve-once.md)
+· [ADR 12: inventory receipts and quorum boundaries](docs/adr/0012-single-owner-inventory-receipts.md)
 
 ## Retry safety
 
@@ -368,9 +386,12 @@ without protection that retry charges the customer twice.
 
 Send an `Idempotency-Key` header and the retry becomes a replay: the same
 order, one charge, one reservation. The key is claimed before any work starts
-and the receipt recorded before the response is written. A repeat while one is
-still running is refused with 409. Failed checkouts release the key, so a
-customer whose card was declined can fix it and retry with the same one.
+and the receipt recorded before the response is written. Within one checkout
+process, concurrent requests with the same key wait and then replay. A persisted
+incomplete claim still returns 409. The `request_id` body field is an alias for
+the checkout key. Failed checkouts release their claim so a declined payment
+can be corrected; the new attempt uses a fresh warehouse request ID.
+This is process-local serialization, not a distributed KV lock.
 
 The transport layer is careful too: `GET` and `PUT` are retried with jittered
 backoff, and `POST` never is. A POST that times out may already have been
@@ -502,7 +523,7 @@ cart exists but belongs to someone else is itself information worth withholding.
 | | |
 |---|---|
 | `GET /warehouse/inventory/{productId}` | Soft availability check; holds nothing |
-| `POST /warehouse/reserve` | `{"items":[...]}` → `200 {"reservationId","expiresAt"}`, `409` short |
+| `POST /warehouse/reserve` | `{"request_id":"purchase-001","items":[...]}` → `200 {"request_id","reservationId","status","expiresAt"}`; same intent replays, changed intent or insufficient stock returns `409` |
 | `POST /warehouse/release` | `{"reservationId"}` → `200`. Idempotent |
 | `GET /warehouse/stats` | Stock and reservation counters, plus consumer stats |
 
@@ -573,6 +594,15 @@ neither belongs in a public repository.
 
 ## Testing
 
+The current local regression run records **221 passing test events** (203 top-level
+and 18 named subtests), zero failures/skips, and **56.5% statement coverage** with
+Go 1.26.8 and the race detector. The 18-cell localhost HTTP matrix returned 503
+in all nine insufficient-quorum cells. `go vet ./...` and `go build ./...` passed.
+[Local validation record](docs/local-validation.json). These checks are separate
+from the owner-confirmed cloud results above and do not repeat that deployment
+or its coordinator-kill experiment.
+
+
 ```bash
 make test       # everything, with the race detector
 make verify     # tidy, lint, vulncheck, tests, terraform — what CI runs
@@ -582,10 +612,10 @@ make evidence   # every gate, recorded under evidence/
 
 The suite is about behaviour that is hard to reason about by reading:
 
-- **`internal/warehouse`** — the reservation lifecycle: release and expiry
-  never both restore the same units, shipping does not deduct twice, and a
-  hundred concurrent reservations for the last hundred units grant exactly a
-  hundred.
+- **`internal/warehouse`** — 100 clients × 10 distinct requests reserve only 100
+  units, 300 receipt replays do not decrement, and 20 × 5 cancellations release
+  only 20 units while 80 commit. Terminal races and invalid shipment replay
+  preserve inventory.
 - **`internal/kv`** — versioning, deterministic conflict resolution, TTL
   expiry, and integration tests that stand up real multi-node clusters over
   loopback HTTP and assert the quorum guarantees hold.
@@ -841,12 +871,13 @@ Worth being explicit about, since some of it looks more finished than it is.
 - **Redis is a single node.** It would be ElastiCache with a replica anywhere
   real. Every caller is written to survive losing it, which is what makes one
   node tolerable here.
-- **Idempotency is deduplication, not a distributed lock.** Two genuinely
-  simultaneous requests with the same key can both proceed; the store has no
-  compare-and-set. The case that actually happens — a retry seconds later — is
-  closed.
-- **There is no outbox.** An order committed while the broker is unreachable is
-  logged and alertable but must be replayed by hand.
+- **Checkout idempotency has one process owner.** Identical concurrent keys
+  serialize within one instance. Two checkout instances can still race because
+  the KV store has no compare-and-set. Local key locks and warehouse request
+  fingerprints accumulate until restart.
+- **There is no outbox.** A committed order can lose its message before publish.
+  Expired or released holds reject later shipment; manual recovery must reconcile
+  the order, payment and current inventory.
 - **Services trust the gateway's identity header.** The trust is in the network
   boundary. Anything that can reach a service directly bypasses authentication,
   which is why they sit on a VPC-only listener. Mutual TLS is where this goes

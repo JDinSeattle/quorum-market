@@ -16,7 +16,8 @@ type Item struct {
 
 // ReserveRequest is the body of POST /warehouse/reserve.
 type ReserveRequest struct {
-	Items []Item `json:"items"`
+	RequestID string `json:"request_id"`
+	Items     []Item `json:"items"`
 }
 
 // ReserveResponse is returned when a reservation is granted. The id is what
@@ -24,6 +25,7 @@ type ReserveRequest struct {
 // only describe the items it wants back, and the warehouse cannot tell a
 // legitimate release from a duplicate one.
 type ReserveResponse struct {
+	RequestID     string    `json:"request_id"`
 	ReservationID string    `json:"reservationId"`
 	Status        string    `json:"status"`
 	ExpiresAt     time.Time `json:"expiresAt"`
@@ -36,7 +38,7 @@ type ReleaseRequest struct {
 
 // ShipMessage is the queue contract between cart and warehouse.
 //
-// It carries ReservationID as well as the items so the warehouse can retire
+// It carries ReservationID as well as the items so the warehouse can commit
 // the reservation it already made instead of decrementing stock a second time.
 type ShipMessage struct {
 	OrderID       string    `json:"orderId"`
