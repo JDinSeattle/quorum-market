@@ -3,12 +3,12 @@ module github.com/JDinSeattle/quorum-market
 go 1.26.8
 
 require (
-	github.com/alicebob/miniredis/v2 v2.38.0
+	github.com/alicebob/miniredis/v2 v2.39.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
-	github.com/rabbitmq/amqp091-go v1.14.0
+	github.com/rabbitmq/amqp091-go v1.15.0
 	github.com/redis/go-redis/v9 v9.22.0
-	golang.org/x/crypto v0.55.0
-	golang.org/x/sync v0.21.0
+	golang.org/x/crypto v0.57.0
+	golang.org/x/sync v0.23.0
 )
 
 require (
@@ -24,6 +24,6 @@ require (
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.70.1 // indirect
 	github.com/prometheus/procfs v0.21.1 // indirect
-	golang.org/x/sys v0.47.0 // indirect
+	golang.org/x/sys v0.48.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 )
