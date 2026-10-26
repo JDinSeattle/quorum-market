@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/JDinSeattle/quorum-market/internal/httpx"
-	"github.com/JDinSeattle/quorum-market/internal/orders"
+	"github.com/simon-jd/quorum-market/internal/httpx"
+	"github.com/simon-jd/quorum-market/internal/orders"
 )
 
 // Client calls the warehouse service. The cart service uses it to check

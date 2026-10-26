@@ -11,9 +11,9 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/JDinSeattle/quorum-market/internal/cache"
-	"github.com/JDinSeattle/quorum-market/internal/httpx"
-	"github.com/JDinSeattle/quorum-market/internal/kv"
+	"github.com/simon-jd/quorum-market/internal/cache"
+	"github.com/simon-jd/quorum-market/internal/httpx"
+	"github.com/simon-jd/quorum-market/internal/kv"
 )
 
 // KeyPrefix namespaces catalogue keys inside the shared KV store.

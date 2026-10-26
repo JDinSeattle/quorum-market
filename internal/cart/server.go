@@ -3,8 +3,8 @@ package cart
 import (
 	"net/http"
 
-	"github.com/JDinSeattle/quorum-market/internal/auth"
-	"github.com/JDinSeattle/quorum-market/internal/httpx"
+	"github.com/simon-jd/quorum-market/internal/auth"
+	"github.com/simon-jd/quorum-market/internal/httpx"
 )
 
 // Server is the cart service's HTTP surface.

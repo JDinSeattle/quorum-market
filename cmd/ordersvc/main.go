@@ -12,13 +12,13 @@ import (
 	"os"
 	"time"
 
-	"github.com/JDinSeattle/quorum-market/internal/envx"
-	"github.com/JDinSeattle/quorum-market/internal/events"
-	"github.com/JDinSeattle/quorum-market/internal/httpx"
-	"github.com/JDinSeattle/quorum-market/internal/kv"
-	"github.com/JDinSeattle/quorum-market/internal/obs"
-	"github.com/JDinSeattle/quorum-market/internal/order"
-	"github.com/JDinSeattle/quorum-market/internal/rmq"
+	"github.com/simon-jd/quorum-market/internal/envx"
+	"github.com/simon-jd/quorum-market/internal/events"
+	"github.com/simon-jd/quorum-market/internal/httpx"
+	"github.com/simon-jd/quorum-market/internal/kv"
+	"github.com/simon-jd/quorum-market/internal/obs"
+	"github.com/simon-jd/quorum-market/internal/order"
+	"github.com/simon-jd/quorum-market/internal/rmq"
 )
 
 func main() {

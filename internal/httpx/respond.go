@@ -7,7 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/JDinSeattle/quorum-market/internal/obs"
+	"github.com/simon-jd/quorum-market/internal/obs"
 )
 
 // maxRequestBody caps how much of a request body is read.

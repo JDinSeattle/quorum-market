@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/JDinSeattle/quorum-market/internal/httpx"
+	"github.com/simon-jd/quorum-market/internal/httpx"
 )
 
 // Decision is the outcome of an authorization attempt.

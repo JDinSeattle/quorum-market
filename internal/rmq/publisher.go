@@ -10,7 +10,7 @@ import (
 
 	amqp "github.com/rabbitmq/amqp091-go"
 
-	"github.com/JDinSeattle/quorum-market/internal/obs"
+	"github.com/simon-jd/quorum-market/internal/obs"
 )
 
 // ErrPoolExhausted means every pooled channel was busy for longer than the

@@ -6,7 +6,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/JDinSeattle/quorum-market/internal/httpx"
+	"github.com/simon-jd/quorum-market/internal/httpx"
 )
 
 // The failure this prevents: a client's connection drops after the charge but

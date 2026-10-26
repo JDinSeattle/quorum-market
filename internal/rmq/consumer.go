@@ -11,7 +11,7 @@ import (
 
 	amqp "github.com/rabbitmq/amqp091-go"
 
-	"github.com/JDinSeattle/quorum-market/internal/obs"
+	"github.com/simon-jd/quorum-market/internal/obs"
 )
 
 // ErrDrop tells the consumer a message can never succeed and must not be

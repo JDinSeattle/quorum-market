@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/JDinSeattle/quorum-market/internal/envx"
+	"github.com/simon-jd/quorum-market/internal/envx"
 )
 
 // Mode selects a replication strategy.

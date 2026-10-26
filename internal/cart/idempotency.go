@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/JDinSeattle/quorum-market/internal/httpx"
-	"github.com/JDinSeattle/quorum-market/internal/kv"
+	"github.com/simon-jd/quorum-market/internal/httpx"
+	"github.com/simon-jd/quorum-market/internal/kv"
 )
 
 // IdempotencyKeyHeader carries a client-chosen key that makes a checkout safe

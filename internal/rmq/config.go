@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/JDinSeattle/quorum-market/internal/envx"
+	"github.com/simon-jd/quorum-market/internal/envx"
 )
 
 // Config describes how to reach the broker and which queue to use.

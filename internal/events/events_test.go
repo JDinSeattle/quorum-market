@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/JDinSeattle/quorum-market/internal/obs"
-	"github.com/JDinSeattle/quorum-market/internal/orders"
-	"github.com/JDinSeattle/quorum-market/internal/rmq"
+	"github.com/simon-jd/quorum-market/internal/obs"
+	"github.com/simon-jd/quorum-market/internal/orders"
+	"github.com/simon-jd/quorum-market/internal/rmq"
 )
 
 func TestEnvelopeRoundTrip(t *testing.T) {

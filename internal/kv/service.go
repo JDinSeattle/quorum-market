@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/JDinSeattle/quorum-market/internal/httpx"
-	"github.com/JDinSeattle/quorum-market/internal/obs"
+	"github.com/simon-jd/quorum-market/internal/httpx"
+	"github.com/simon-jd/quorum-market/internal/obs"
 )
 
 // Service implements both replication strategies over a single Store. The

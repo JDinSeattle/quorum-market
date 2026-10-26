@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/JDinSeattle/quorum-market/internal/busywait"
-	"github.com/JDinSeattle/quorum-market/internal/httpx"
+	"github.com/simon-jd/quorum-market/internal/busywait"
+	"github.com/simon-jd/quorum-market/internal/httpx"
 )
 
 // An unavailable replica returns an explicit 503 at its real HTTP boundary.

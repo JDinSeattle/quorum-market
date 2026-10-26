@@ -9,7 +9,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/JDinSeattle/quorum-market/internal/obs"
+	"github.com/simon-jd/quorum-market/internal/obs"
 )
 
 func TestRouterAnswersUnmatchedPaths(t *testing.T) {

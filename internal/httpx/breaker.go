@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/JDinSeattle/quorum-market/internal/obs"
+	"github.com/simon-jd/quorum-market/internal/obs"
 )
 
 // ErrBreakerOpen is returned when a call is refused without being attempted.

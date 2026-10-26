@@ -7,9 +7,9 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/JDinSeattle/quorum-market/internal/events"
-	"github.com/JDinSeattle/quorum-market/internal/orders"
-	"github.com/JDinSeattle/quorum-market/internal/rmq"
+	"github.com/simon-jd/quorum-market/internal/events"
+	"github.com/simon-jd/quorum-market/internal/orders"
+	"github.com/simon-jd/quorum-market/internal/rmq"
 )
 
 // Shipper applies ship messages from the queue to the inventory, then tells

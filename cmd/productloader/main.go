@@ -18,10 +18,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/JDinSeattle/quorum-market/internal/envx"
-	"github.com/JDinSeattle/quorum-market/internal/httpx"
-	"github.com/JDinSeattle/quorum-market/internal/obs"
-	"github.com/JDinSeattle/quorum-market/internal/product"
+	"github.com/simon-jd/quorum-market/internal/envx"
+	"github.com/simon-jd/quorum-market/internal/httpx"
+	"github.com/simon-jd/quorum-market/internal/obs"
+	"github.com/simon-jd/quorum-market/internal/product"
 )
 
 func main() {

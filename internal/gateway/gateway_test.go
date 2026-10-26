@@ -10,8 +10,8 @@ import (
 	"github.com/alicebob/miniredis/v2"
 	"github.com/redis/go-redis/v9"
 
-	"github.com/JDinSeattle/quorum-market/internal/auth"
-	"github.com/JDinSeattle/quorum-market/internal/ratelimit"
+	"github.com/simon-jd/quorum-market/internal/auth"
+	"github.com/simon-jd/quorum-market/internal/ratelimit"
 )
 
 const testSecret = "a-gateway-test-secret-long-enough-to-pass"

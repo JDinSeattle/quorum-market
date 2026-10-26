@@ -20,10 +20,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/JDinSeattle/quorum-market/internal/auth"
-	"github.com/JDinSeattle/quorum-market/internal/httpx"
-	"github.com/JDinSeattle/quorum-market/internal/obs"
-	"github.com/JDinSeattle/quorum-market/internal/ratelimit"
+	"github.com/simon-jd/quorum-market/internal/auth"
+	"github.com/simon-jd/quorum-market/internal/httpx"
+	"github.com/simon-jd/quorum-market/internal/obs"
+	"github.com/simon-jd/quorum-market/internal/ratelimit"
 )
 
 // Route maps a public path prefix onto an upstream service.

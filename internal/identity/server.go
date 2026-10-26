@@ -3,8 +3,8 @@ package identity
 import (
 	"net/http"
 
-	"github.com/JDinSeattle/quorum-market/internal/auth"
-	"github.com/JDinSeattle/quorum-market/internal/httpx"
+	"github.com/simon-jd/quorum-market/internal/auth"
+	"github.com/simon-jd/quorum-market/internal/httpx"
 )
 
 // Server is the identity service's HTTP surface.

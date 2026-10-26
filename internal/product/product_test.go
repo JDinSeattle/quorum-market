@@ -11,10 +11,10 @@ import (
 	"github.com/alicebob/miniredis/v2"
 	"github.com/redis/go-redis/v9"
 
-	"github.com/JDinSeattle/quorum-market/internal/busywait"
-	"github.com/JDinSeattle/quorum-market/internal/cache"
-	"github.com/JDinSeattle/quorum-market/internal/httpx"
-	"github.com/JDinSeattle/quorum-market/internal/kv"
+	"github.com/simon-jd/quorum-market/internal/busywait"
+	"github.com/simon-jd/quorum-market/internal/cache"
+	"github.com/simon-jd/quorum-market/internal/httpx"
+	"github.com/simon-jd/quorum-market/internal/kv"
 )
 
 // testService stands up a real single-node KV cluster and, optionally, a real

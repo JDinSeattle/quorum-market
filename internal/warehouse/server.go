@@ -4,9 +4,9 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/JDinSeattle/quorum-market/internal/busywait"
-	"github.com/JDinSeattle/quorum-market/internal/httpx"
-	"github.com/JDinSeattle/quorum-market/internal/orders"
+	"github.com/simon-jd/quorum-market/internal/busywait"
+	"github.com/simon-jd/quorum-market/internal/httpx"
+	"github.com/simon-jd/quorum-market/internal/orders"
 )
 
 // Server is the warehouse's HTTP surface.

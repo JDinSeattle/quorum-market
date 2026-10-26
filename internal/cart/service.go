@@ -7,11 +7,11 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/JDinSeattle/quorum-market/internal/busywait"
-	"github.com/JDinSeattle/quorum-market/internal/httpx"
-	"github.com/JDinSeattle/quorum-market/internal/kv"
-	"github.com/JDinSeattle/quorum-market/internal/product"
-	"github.com/JDinSeattle/quorum-market/internal/warehouse"
+	"github.com/simon-jd/quorum-market/internal/busywait"
+	"github.com/simon-jd/quorum-market/internal/httpx"
+	"github.com/simon-jd/quorum-market/internal/kv"
+	"github.com/simon-jd/quorum-market/internal/product"
+	"github.com/simon-jd/quorum-market/internal/warehouse"
 )
 
 // AddItemRequest is the body of POST /shopping-cart/{cartId}/add-item.

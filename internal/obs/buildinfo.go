@@ -10,7 +10,7 @@ import (
 
 // Build metadata, stamped at link time:
 //
-//	-ldflags "-X github.com/JDinSeattle/quorum-market/internal/obs.version=1.4.0 ..."
+//	-ldflags "-X github.com/simon-jd/quorum-market/internal/obs.version=1.4.0 ..."
 //
 // Defaults describe an unstamped local build so a developer binary is never
 // mistaken for a released one.

@@ -9,8 +9,8 @@ import (
 	"github.com/alicebob/miniredis/v2"
 	"github.com/redis/go-redis/v9"
 
-	"github.com/JDinSeattle/quorum-market/internal/events"
-	"github.com/JDinSeattle/quorum-market/internal/orders"
+	"github.com/simon-jd/quorum-market/internal/events"
+	"github.com/simon-jd/quorum-market/internal/orders"
 )
 
 func testService(t *testing.T, inboxSize int) *Service {

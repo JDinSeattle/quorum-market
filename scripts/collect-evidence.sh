@@ -350,7 +350,7 @@ for line in open(sys.argv[1]):
     m = re.match(r'(\S+\.go):\d+:\s+\S+\s+([\d.]+)%', line)
     if not m:
         continue
-    pkg = m.group(1).rsplit('/', 1)[0].replace('github.com/JDinSeattle/quorum-market/', '')
+    pkg = m.group(1).rsplit('/', 1)[0].replace('github.com/simon-jd/quorum-market/', '')
     totals[pkg][0] += float(m.group(2))
     totals[pkg][1] += 1
 rows = sorted(((s / n, p) for p, (s, n) in totals.items() if n), reverse=True)

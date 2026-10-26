@@ -31,9 +31,9 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH:-amd64} \
     go build -trimpath \
       -ldflags="-s -w \
-        -X github.com/JDinSeattle/quorum-market/internal/obs.version=${VERSION} \
-        -X github.com/JDinSeattle/quorum-market/internal/obs.commit=${COMMIT} \
-        -X github.com/JDinSeattle/quorum-market/internal/obs.date=${BUILD_DATE}" \
+        -X github.com/simon-jd/quorum-market/internal/obs.version=${VERSION} \
+        -X github.com/simon-jd/quorum-market/internal/obs.commit=${COMMIT} \
+        -X github.com/simon-jd/quorum-market/internal/obs.date=${BUILD_DATE}" \
       -o /out/ ./cmd/...
 
 # Distroless: no shell, no package manager, no setuid binaries. There is
@@ -54,7 +54,7 @@ ARG COMMIT=unknown
 ARG BUILD_DATE=unknown
 LABEL org.opencontainers.image.title="quorum-market" \
       org.opencontainers.image.description="Distributed e-commerce backend: microservices, custom KV replication, RabbitMQ fulfilment." \
-      org.opencontainers.image.source="https://github.com/JDinSeattle/quorum-market" \
+      org.opencontainers.image.source="https://github.com/simon-jd/quorum-market" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.revision="${COMMIT}" \
       org.opencontainers.image.created="${BUILD_DATE}"

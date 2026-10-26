@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/JDinSeattle/quorum-market/internal/orders"
+	"github.com/simon-jd/quorum-market/internal/orders"
 )
 
 func items(pairs ...any) []orders.Item {

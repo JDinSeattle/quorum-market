@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/JDinSeattle/quorum-market/internal/busywait"
-	"github.com/JDinSeattle/quorum-market/internal/httpx"
+	"github.com/simon-jd/quorum-market/internal/busywait"
+	"github.com/simon-jd/quorum-market/internal/httpx"
 )
 
 // Server exposes a KV node over HTTP.

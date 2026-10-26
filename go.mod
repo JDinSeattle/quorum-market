@@ -1,4 +1,4 @@
-module github.com/JDinSeattle/quorum-market
+module github.com/simon-jd/quorum-market
 
 go 1.26.8
 

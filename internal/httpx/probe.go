@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/JDinSeattle/quorum-market/internal/obs"
+	"github.com/simon-jd/quorum-market/internal/obs"
 )
 
 // Ping returns a readiness probe that checks a dependency's health endpoint.

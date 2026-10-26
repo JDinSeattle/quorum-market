@@ -11,8 +11,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/JDinSeattle/quorum-market/internal/envx"
-	"github.com/JDinSeattle/quorum-market/internal/obs"
+	"github.com/simon-jd/quorum-market/internal/envx"
+	"github.com/simon-jd/quorum-market/internal/obs"
 )
 
 // ServerConfig describes a service's public listener.

@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/JDinSeattle/quorum-market/internal/obs"
+	"github.com/simon-jd/quorum-market/internal/obs"
 )
 
 func testClient(cfg ClientConfig) *Client {

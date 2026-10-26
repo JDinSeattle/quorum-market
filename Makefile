@@ -16,9 +16,9 @@ PROMETHEUS_PORT ?= 9490
 GRAFANA_PORT    ?= 3000
 
 LDFLAGS := -s -w \
-	-X github.com/JDinSeattle/quorum-market/internal/obs.version=$(VERSION) \
-	-X github.com/JDinSeattle/quorum-market/internal/obs.commit=$(COMMIT) \
-	-X github.com/JDinSeattle/quorum-market/internal/obs.date=$(BUILD_DATE)
+	-X github.com/simon-jd/quorum-market/internal/obs.version=$(VERSION) \
+	-X github.com/simon-jd/quorum-market/internal/obs.commit=$(COMMIT) \
+	-X github.com/simon-jd/quorum-market/internal/obs.date=$(BUILD_DATE)
 
 export VERSION COMMIT BUILD_DATE PROMETHEUS_PORT GRAFANA_PORT
 

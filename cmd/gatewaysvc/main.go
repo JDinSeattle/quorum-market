@@ -10,14 +10,14 @@ import (
 	"os"
 	"time"
 
-	"github.com/JDinSeattle/quorum-market/internal/auth"
-	"github.com/JDinSeattle/quorum-market/internal/envx"
-	"github.com/JDinSeattle/quorum-market/internal/gateway"
-	"github.com/JDinSeattle/quorum-market/internal/httpx"
-	"github.com/JDinSeattle/quorum-market/internal/identity"
-	"github.com/JDinSeattle/quorum-market/internal/obs"
-	"github.com/JDinSeattle/quorum-market/internal/ratelimit"
-	"github.com/JDinSeattle/quorum-market/internal/redisx"
+	"github.com/simon-jd/quorum-market/internal/auth"
+	"github.com/simon-jd/quorum-market/internal/envx"
+	"github.com/simon-jd/quorum-market/internal/gateway"
+	"github.com/simon-jd/quorum-market/internal/httpx"
+	"github.com/simon-jd/quorum-market/internal/identity"
+	"github.com/simon-jd/quorum-market/internal/obs"
+	"github.com/simon-jd/quorum-market/internal/ratelimit"
+	"github.com/simon-jd/quorum-market/internal/redisx"
 )
 
 func main() {

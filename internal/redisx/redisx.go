@@ -10,7 +10,7 @@ import (
 
 	"github.com/redis/go-redis/v9"
 
-	"github.com/JDinSeattle/quorum-market/internal/envx"
+	"github.com/simon-jd/quorum-market/internal/envx"
 )
 
 // Config describes how to reach Redis.

@@ -84,7 +84,7 @@ formatters:
   settings:
     goimports:
       local-prefixes:
-        - github.com/JDinSeattle/quorum-market
+        - github.com/simon-jd/quorum-market
 
 issues:
   max-issues-per-linter: 0

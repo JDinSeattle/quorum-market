@@ -9,8 +9,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/JDinSeattle/quorum-market/internal/httpx"
-	"github.com/JDinSeattle/quorum-market/internal/obs"
+	"github.com/simon-jd/quorum-market/internal/httpx"
+	"github.com/simon-jd/quorum-market/internal/obs"
 )
 
 // Replicator is the node-to-node transport. Replication rides the same HTTP

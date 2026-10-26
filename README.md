@@ -1,6 +1,6 @@
 # Quorum Market
 
-[![CI](https://github.com/JDinSeattle/quorum-market/actions/workflows/ci.yml/badge.svg)](https://github.com/JDinSeattle/quorum-market/actions/workflows/ci.yml)
+[![CI](https://github.com/simon-jd/quorum-market/actions/workflows/ci.yml/badge.svg)](https://github.com/simon-jd/quorum-market/actions/workflows/ci.yml)
 [![Go](https://img.shields.io/badge/go-1.25%2B-00ADD8?logo=go&logoColor=white)](go.mod)
 [![Evidence](https://img.shields.io/badge/evidence-19%2F19%20gates-brightgreen)](evidence/latest/SUMMARY.md)
 

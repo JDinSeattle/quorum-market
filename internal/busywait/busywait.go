@@ -19,7 +19,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/JDinSeattle/quorum-market/internal/envx"
+	"github.com/simon-jd/quorum-market/internal/envx"
 )
 
 // Defaults for the log-normal delay distribution.

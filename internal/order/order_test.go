@@ -7,11 +7,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/JDinSeattle/quorum-market/internal/busywait"
-	"github.com/JDinSeattle/quorum-market/internal/events"
-	"github.com/JDinSeattle/quorum-market/internal/httpx"
-	"github.com/JDinSeattle/quorum-market/internal/kv"
-	"github.com/JDinSeattle/quorum-market/internal/orders"
+	"github.com/simon-jd/quorum-market/internal/busywait"
+	"github.com/simon-jd/quorum-market/internal/events"
+	"github.com/simon-jd/quorum-market/internal/httpx"
+	"github.com/simon-jd/quorum-market/internal/kv"
+	"github.com/simon-jd/quorum-market/internal/orders"
 )
 
 func testService(t *testing.T) *Service {

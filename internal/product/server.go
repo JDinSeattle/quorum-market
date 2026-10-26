@@ -3,8 +3,8 @@ package product
 import (
 	"net/http"
 
-	"github.com/JDinSeattle/quorum-market/internal/busywait"
-	"github.com/JDinSeattle/quorum-market/internal/httpx"
+	"github.com/simon-jd/quorum-market/internal/busywait"
+	"github.com/simon-jd/quorum-market/internal/httpx"
 )
 
 // Server is the catalogue's HTTP surface.
