@@ -7,7 +7,7 @@
 A distributed e-commerce backend in Go. Eight microservices behind an API
 gateway, three custom key-value clusters with different replication
 strategies, Redis doing four different jobs, RabbitMQ carrying both commands
-and events, and AWS deployment configuration. The cloud qualification below uses one Linux host.
+and events, and AWS deployment configuration. The cloud results below use one Linux host.
 
 | | |
 |---|---|
@@ -81,9 +81,9 @@ Only the gateway is publicly reachable. Everything else answers on a
 VPC-restricted listener, which is what makes the identity headers the services
 trust safe to trust.
 
-## Cloud qualification results
+## Results
 
-These results follow the project owner’s separately run cloud qualification recorded in the experience bank. The workload, environment, denominators and limitations below belong to that round; local regression checks for this checkout are separate. [Result record](docs/experience-bank-results.json).
+These results come from a separate cloud test run. The workload, environment, denominators and limitations below belong to that run; local regression checks for this checkout are separate.
 
 - Built a Go 1.26.8 e-commerce backend on a single Linux host (8 cores/16 GiB, RabbitMQ 4.1, Redis 7.2, 20 ms injected network latency) with 8 application services and three in-memory KV clusters: product 5 nodes W5/R1, cart 5 nodes W3/R3 and core 3 nodes W2/R2, documenting that these quorum intersections do not by themselves provide CAS or linearizability.
 
@@ -599,7 +599,7 @@ and 18 named subtests), zero failures/skips, and **56.5% statement coverage** wi
 Go 1.26.8 and the race detector. The 18-cell localhost HTTP matrix returned 503
 in all nine insufficient-quorum cells. `go vet ./...` and `go build ./...` passed.
 [Local validation record](docs/local-validation.json). These checks are separate
-from the owner-confirmed cloud results above and do not repeat that deployment
+from the cloud results above and do not repeat that deployment
 or its coordinator-kill experiment.
 
 

@@ -1,6 +1,6 @@
 {
   "verified_at_utc": "2026-10-04T04:43:10.413427+00:00",
-  "scope": "Local regression on the current implementation; separate from the owner-confirmed cloud experience-bank results.",
+  "scope": "Local regression on the current implementation; separate from the cloud results in the README.",
   "base_commit": "35153cb890f41545d156003c5db3603daffe63a2",
   "go_version": "go1.26.8 linux/amd64",
   "commands": [

@@ -25,7 +25,7 @@ stock until its TTL. After release or expiry, the warehouse rejects a delayed
 shipment instead of deducting stock again. Recovery requires reconciling the
 order, payment, and current stock; blindly replaying an expired hold is unsafe.
 
-The owner-confirmed cloud experiment in the README killed the coordinator in
+The cloud experiment in the README killed the coordinator in
 this gap in ten trials: ten orders were readable and no ship messages arrived.
 That is a separate cloud result, not a claim that this local regression run
 repeated the kill experiment. In-memory quorum acknowledgements also do not
